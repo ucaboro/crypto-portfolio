@@ -124,6 +124,26 @@ align-content: center ;
   color: #0E8618;
 }
 
+.navbar {
+  margin-bottom: 0px !important;
+  border-radius: 0px;
+  background-color: black !important;
+}
+/*Correcting bootstrap default link styling*/
+nav li a{
+  color: grey;
+  text-decoration: none !important;
+}
+
+nav li a:hover{
+  color: white;
+}
+
+nav li a:focus{
+  color: white;
+}
+
+
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

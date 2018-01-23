@@ -7,6 +7,8 @@ import firebase from './firebase.js'
 
 //Importing reusable components
 import CryptoCard from './Components/card.js'
+import AppNavbar from './Components/navbar.js'
+import Main from './Containers/Main.js'
 
 class App extends Component {
 constructor(){
@@ -30,18 +32,11 @@ componentWillMount(){
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <h1 className="App-title">Manage your Crypto Portfolio the easy way</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-        <div><p>Database speed: </p>{this.state.speed}</div>
-
-           <CryptoCard/>
+      <AppNavbar/>
       </div>
     );
   }
 }
+
 
 export default App;
