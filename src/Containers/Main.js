@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import firebase from '../firebase.js'
+import {firebase, auth, provider } from '../firebase/index.js';
 
 export default class Main extends Component {
 constructor(){
@@ -10,7 +10,7 @@ constructor(){
   }
 }
 
-componentWillMount(){
+/*componentWillMount(){
   const rootRef = firebase.database().ref('speed');
   rootRef.on('value', snap => {
     console.log('speed is ' + snap.val())
@@ -18,7 +18,7 @@ componentWillMount(){
       speed: snap.val()
     })
   })
-}
+}*/
 
 render() {
   return (
