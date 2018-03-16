@@ -1,13 +1,13 @@
-import React, {Component} from 'react';
-import {Nav, Navbar, NavItem, NavDropdown, MenuItem} from 'react-bootstrap'
-import {BrowserRouter as Router, Route, Link, Redirect, withRouter} from 'react-router-dom'
+import React from 'react';
+import {Nav, Navbar, NavItem} from 'react-bootstrap'
+import { Link} from 'react-router-dom'
+import PropTypes from 'prop-types';
+import { LinkContainer } from 'react-router-bootstrap';
+import { auth } from '../firebase/index.js';
 
 import * as routes from '../constants/routes';
-import SignOutButton from '../Containers/SignOut';
 
-import firebase, {auth, provider} from '../firebase/index.js';
-
-const Navigation = ({authUser}) => <div>
+const Navigation = (props, {authUser}) => <div>
   {
     authUser
       ? <NavigationAuth/>
@@ -15,28 +15,44 @@ const Navigation = ({authUser}) => <div>
   }
 </div>
 
+Navigation.contextTypes = {
+  authUser: PropTypes.object,
+};
+
+
+
+
+
 const NavigationNonAuth = () => <div>
-  <Navbar inverse="inverse" collapseOnSelect="collapseOnSelect">
+  <Navbar inverse collapseOnSelect>
     <Navbar.Header>
+      <LinkContainer to={routes.LANDING}>
       <Navbar.Brand>
-        <Link to={routes.LANDING}>Crypto Portfolio</Link>
+        Crypto Portfolio
       </Navbar.Brand>
+      </LinkContainer>
       <Navbar.Toggle/>
     </Navbar.Header>
     <Navbar.Collapse>
       <Nav>
-        <NavItem eventKey={1}>
-          <Link to={routes.ABOUT}>About</Link>
+        <LinkContainer to={routes.ABOUT}>
+          <NavItem eventKey={1}>
+          About
         </NavItem>
+        </LinkContainer>
       </Nav>
-      <Nav pullRight="pullRight">
-        <NavItem eventKey={1} href="#">
-          <Link to={routes.SIGN_IN}>Sign In</Link>
+      <Nav pullRight>
+        <LinkContainer to={routes.SIGN_IN}>
+        <NavItem eventKey={1}>
+          Sign In
         </NavItem>
-        <NavItem eventKey={2} href="#">
-          <Link to={routes.REGISTER}>Register</Link>
+        </LinkContainer>
+        <LinkContainer to={routes.REGISTER}>
+        <NavItem eventKey={2}>
+          Register
         </NavItem>
-        <NavItem eventKey={3} href="#">
+        </LinkContainer>
+        <NavItem eventKey={3}>
           Language
         </NavItem>
       </Nav>
@@ -46,29 +62,38 @@ const NavigationNonAuth = () => <div>
 </div>
 
 const NavigationAuth = () => <div>
-  <Navbar inverse="inverse" collapseOnSelect="collapseOnSelect">
+  <Navbar inverse collapseOnSelect>
     <Navbar.Header>
+      <LinkContainer to={routes.LANDING}>
       <Navbar.Brand>
-        <Link to={routes.LANDING}>Crypto Portfolio</Link>
+        Crypto Portfolio
       </Navbar.Brand>
+      </LinkContainer>
       <Navbar.Toggle/>
     </Navbar.Header>
     <Navbar.Collapse>
       <Nav>
+        <LinkContainer to={routes.ABOUT}>
         <NavItem eventKey={1}>
-          <Link to={routes.ABOUT}>About</Link>
+          About
         </NavItem>
+        </LinkContainer>
+        <LinkContainer to={routes.ACCOUNT}>
         <NavItem eventKey={1}>
-          <Link to={routes.ACCOUNT}>Personal</Link>
+          Personal
         </NavItem>
+        </LinkContainer>
       </Nav>
-      <Nav pullRight="pullRight">
-        <NavItem eventKey={1} href="#">
-          <SignOutButton/>
+
+      <Nav pullRight>
+        <NavItem eventKey={5} onClick={auth.doSignOut}>
+          Sign Out
         </NavItem>
-        <NavItem eventKey={3} href="#">
+
+        <NavItem eventKey={3} >
           Language
         </NavItem>
+
       </Nav>
     </Navbar.Collapse>
   </Navbar>

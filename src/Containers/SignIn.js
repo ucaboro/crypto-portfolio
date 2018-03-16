@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import { withRouter } from 'react-router-dom';
 
-import { Register, SignUpLink } from './Register';
+import { SignUpLink } from './Register';
 import { auth } from '../firebase';
 import * as routes from '../constants/routes';
 
@@ -19,8 +19,8 @@ const SignInPage = ({ history }) =>
 });
 
 const INITIAL_STATE = {
-  email: '',
-  password: '',
+  email: 'mas1311@yandex.ru',
+  password: '123456',
   error: null,
 };
 
@@ -30,6 +30,7 @@ class SignInForm extends Component {
 
     this.state = { ...INITIAL_STATE };
   }
+
 
   onSubmit = (event) => {
     const {
@@ -81,6 +82,7 @@ class SignInForm extends Component {
         <button disabled={isInvalid} type="submit">
           Sign In
         </button>
+
 
         { error && <p>{error.message}</p> }
       </form>

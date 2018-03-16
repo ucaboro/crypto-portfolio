@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Button, Panel, Grid, Col, Row} from 'react-bootstrap';
+import {Col, Row} from 'react-bootstrap';
 
 export default class CryptoCard extends Component {
 
@@ -11,7 +11,7 @@ export default class CryptoCard extends Component {
        <div className='cryptoLine'>
         <Row className='cryptoLabel'>
            <Col xs={4} md={4}>Label</Col>
-           <Col xs={4} md={4}><img height="35px" src="http://uploads.webflow.com/5a2b24419ef2d60001525d50/5a2b24b0911bfa000168f7bd_bitcoin_PNG47.png" className="logo" /></Col>
+           <Col xs={4} md={4}><img height="35px" alt="pic" src="http://uploads.webflow.com/5a2b24419ef2d60001525d50/5a2b24b0911bfa000168f7bd_bitcoin_PNG47.png" className="logo" /></Col>
            <Col xs={4} md={4}>Abbr</Col>
         </Row>
         </div>

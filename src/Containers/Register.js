@@ -2,13 +2,11 @@ import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import * as routes from '../constants/routes';
 
-import {firebase, provider, auth } from '../firebase/index.js';
+import { provider, auth } from '../firebase/index.js';
 
 import {Form, FormGroup, FormControl, ControlLabel, Checkbox, Button, Col} from 'react-bootstrap'
-import Person from './Person.js'
 
 const INITIAL_STATE = {
-  username: '',
   email: '',
   passwordOne: '',
   passwordTwo: '',
@@ -38,7 +36,6 @@ onSubmit = (event) => {
 event.preventDefault();
 
 const {
-  username,
   email,
   passwordOne
 } = this.state;
@@ -163,7 +160,7 @@ const isInvalid =
 {this.state.user ?
    <div>
      <div className='user-profile'>
-       <img src={this.state.user.photoURL} />
+       <img alt="ava" src={this.state.user.photoURL} />
      </div>
    </div>
    :

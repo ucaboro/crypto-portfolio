@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 
-import {firebase, auth, provider } from '../firebase/index.js';
-
 export default class Main extends Component {
 constructor(){
   super();

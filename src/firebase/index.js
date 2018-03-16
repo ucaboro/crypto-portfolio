@@ -1,8 +1,10 @@
 import * as auth from './auth.js';
-import {provider, firebase} from './firebase.js';
+import * as db from './db.js';
+import {firebase, provider} from './firebase.js';
 
 export {
   auth,
   firebase,
-  provider
+  provider,
+  db
 };
