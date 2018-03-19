@@ -5,13 +5,20 @@ import { withRouter } from 'react-router-dom';
 import { SignUpLink } from './Register';
 import { auth } from '../firebase';
 import * as routes from '../constants/routes';
+import TextField from 'material-ui/TextField';
+
+import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
+import {Grid, Row, Col} from 'react-bootstrap';
+import RaisedButton from 'material-ui/RaisedButton';
+import {blue500, red500} from 'material-ui/styles/colors';
 
 
 const SignInPage = ({ history }) =>
   <div>
-    <h1>SignIn</h1>
+    <br/>
+    <br/>
     <SignInForm history={history} />
-    <SignUpLink />
+
   </div>
 
   const byPropKey = (propertyName, value) => () => ({
@@ -19,8 +26,8 @@ const SignInPage = ({ history }) =>
 });
 
 const INITIAL_STATE = {
-  email: 'mas1311@yandex.ru',
-  password: '123456',
+  email: '',
+  password: '',
   error: null,
 };
 
@@ -66,29 +73,62 @@ class SignInForm extends Component {
       email === '';
 
     return (
-      <form onSubmit={this.onSubmit}>
-        <input
-          value={email}
-          onChange={event => this.setState(byPropKey('email', event.target.value))}
-          type="text"
-          placeholder="Email Address"
-        />
-        <input
-          value={password}
-          onChange={event => this.setState(byPropKey('password', event.target.value))}
-          type="password"
-          placeholder="Password"
-        />
-        <button disabled={isInvalid} type="submit">
-          Sign In
-        </button>
+      <Grid>
+        <Row>
+          <Col xs={2} md={3}></Col>
+            <Col xs={8} md={6} lg={6}>
 
-
-        { error && <p>{error.message}</p> }
-      </form>
+              <Card className="SignInCard">
+                <CardText>
+                    <form onSubmit={this.onSubmit}>
+                      <TextField
+                        floatingLabelText="Email"
+                        floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+                        underlineFocusStyle={styles.underlineStyle}
+                        value={email}
+                        onChange={event => this.setState(byPropKey('email', event.target.value))}
+                        type="text"
+                      />
+                    <br/>
+                      <TextField
+                        floatingLabelText="Password"
+                        floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+                        underlineFocusStyle={styles.underlineStyle}
+                        value={password}
+                        onChange={event => this.setState(byPropKey('password', event.target.value))}
+                        type="password"
+                      />
+                    { error && <p style={styles.errorStyle}>{error.message}</p> }
+                    </form>
+                </CardText>
+                <CardActions>
+                     <RaisedButton buttonStyle={{width: '250px'}} backgroundColor='#42a5f5' disabled={isInvalid} onClick={this.onSubmit} label="Sign In" labelColor='white'/>
+                </CardActions>
+                    <SignUpLink />
+                    <br/>
+              </Card>
+             </Col>
+             <Col xs={2} md={3}></Col>
+        </Row>
+    </Grid>
     );
   }
 }
+
+const styles = {
+  errorStyle: {
+    color: red500,
+  },
+  underlineStyle: {
+    borderColor: blue500,
+  },
+  floatingLabelFocusStyle: {
+    color: blue500,
+  },
+};
+
+
+
 
 export default withRouter(SignInPage);
 
