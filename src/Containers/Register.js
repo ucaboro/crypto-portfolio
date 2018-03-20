@@ -3,8 +3,13 @@ import { Link, withRouter } from 'react-router-dom';
 import * as routes from '../constants/routes';
 
 import { provider, auth } from '../firebase/index.js';
+import Checkbox from 'material-ui/Checkbox';
 
-import {Form, FormGroup, FormControl, ControlLabel, Checkbox, Button, Col} from 'react-bootstrap'
+import TextField from 'material-ui/TextField';
+import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
+import {Grid, Row, Col} from 'react-bootstrap';
+import RaisedButton from 'material-ui/RaisedButton';
+import {blue500, red500} from 'material-ui/styles/colors';
 
 const INITIAL_STATE = {
   email: '',
@@ -19,7 +24,8 @@ const byPropKey = (propertyName, value) => () => ({
 
 const SignUpPage = ({ history }) =>
   <div>
-    <h1>SignUp</h1>
+    <br/>
+    <br/>
     <Register history={history} />
   </div>
 
@@ -90,88 +96,67 @@ const isInvalid =
   email === '';
 
     return(
-  <div>
-  <Form horizontal>
-  <FormGroup controlId="formHorizontalEmail">
-    <Col componentClass={ControlLabel} sm={2}>
-      Email
-    </Col>
-    <Col sm={10}>
-      <FormControl value={email}
-        type="email"
-        placeholder="Email"
-        onChange = {event => this.setState(byPropKey('email',event.target.value))} />
-    </Col>
-  </FormGroup>
+      <Grid>
+        <Col xs={0} md={3}></Col>
+            <Col xs={12} md={6} lg={6}>
+              <Card className="SignInCard">
+                <CardText>
+                    <form onSubmit={this.onSubmit}>
+                      <TextField
+                        floatingLabelText="Email"
+                        floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+                        underlineFocusStyle={styles.underlineStyle}
+                        value={email}
+                        onChange={event => this.setState(byPropKey('email', event.target.value))}
+                        type="text"
+                      />
+                    <br/>
+                      <TextField
+                        floatingLabelText="Password"
+                        floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+                        underlineFocusStyle={styles.underlineStyle}
+                        value={passwordOne}
+                        onChange={event => this.setState(byPropKey('passwordOne', event.target.value))}
+                        type="password"
+                      />
+                    <br/>
+                      <TextField
+                        floatingLabelText="Confirm Password"
+                        floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+                        underlineFocusStyle={styles.underlineStyle}
+                        value={passwordTwo}
+                        onChange={event => this.setState(byPropKey('passwordTwo', event.target.value))}
+                        type="password"
+                      />
+                    { error && <p style={styles.errorStyle}>{error.message}</p> }
+                    </form>
+                </CardText>
+                <CardActions>
+                     <RaisedButton buttonStyle={{minWidth: '250px'}} backgroundColor='#42a5f5' disabled={isInvalid} onClick={this.onSubmit} label="Sign Up" labelColor='white'/>
+                     <br/>
+                     <Checkbox iconStyle={{fill:'#2196F3', marginLeft: '-10px',}} style={{marginLeft: '33%', marginTop:'10px'}} labelStyle={{width: '100px', color: '#2196F3'}} label="Remember me"/>
+            </CardActions>
+              </Card>
+             </Col>
+    </Grid>
 
-  <FormGroup controlId="formHorizontalPassword">
-    <Col componentClass={ControlLabel} sm={2}>
-      Password
-    </Col>
-    <Col sm={10}>
-      <FormControl value={passwordOne}
-         type="password"
-         placeholder="Password"
-         onChange = {event => this.setState(byPropKey('passwordOne', event.target.value))} />
-    </Col>
-  </FormGroup>
+     //<img alt="ava" src={this.state.user.photoURL} />
 
-  <FormGroup controlId="formHorizontalPassword2">
-    <Col componentClass={ControlLabel} sm={2}>
-      Password
-    </Col>
-    <Col sm={10}>
-      <FormControl value={passwordTwo}
-         type="password"
-         placeholder="Confirm Password"
-         onChange = {event => this.setState(byPropKey('passwordTwo', event.target.value))} />
-    </Col>
-  </FormGroup>
-
-  <FormGroup>
-    <Col smOffset={2} sm={10}>
-      <Checkbox>Remember me</Checkbox>
-    </Col>
-  </FormGroup>
-
-  <FormGroup>
-    <Col smOffset={2} sm={10}>
-      <Button
-      onClick = {this.onSubmit}
-      disabled = {isInvalid}
-      type="submit">Sign Up
-      </Button>
-      {error && <p>{error.message}</p>}
-    </Col>
-  </FormGroup>
-</Form>
-
-
-
-<div className="wrapper">
-  <h1>Fun Food Friends</h1>
-  {this.state.user ?
-    <button onClick={this.logout}>Log Out</button>
-    :
-    <button onClick={this.login}>Log In</button>
-  }
-</div>
-
-{this.state.user ?
-   <div>
-     <div className='user-profile'>
-       <img alt="ava" src={this.state.user.photoURL} />
-     </div>
-   </div>
-   :
-   <div className='wrapper'>
-     <p>You must be logged in to see the potluck list and submit to it.</p>
-   </div>
- }
-</div>
-    )
+    );
   }
 }
+const styles = {
+  errorStyle: {
+    color: red500,
+  },
+  underlineStyle: {
+    borderColor: blue500,
+  },
+  floatingLabelFocusStyle: {
+    color: blue500,
+  },
+};
+
 
 const SignUpLink = () =>
   <p>

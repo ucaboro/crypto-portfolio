@@ -5,7 +5,14 @@ margin-top: -50px;
 }
 
 .SignInCard{
-min-width: 50%;
+min-width: 275px;
+}
+
+
+
+.navbar{
+  min-width: 320px;
+
 }
 
 .App {

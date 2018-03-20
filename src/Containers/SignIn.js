@@ -74,9 +74,9 @@ class SignInForm extends Component {
 
     return (
       <Grid>
-        <Row>
-          <Col xs={2} md={3}></Col>
-            <Col xs={8} md={6} lg={6}>
+
+          <Col xs={0} md={3}></Col>
+            <Col xs={12} md={6} lg={6}>
 
               <Card className="SignInCard">
                 <CardText>
@@ -108,8 +108,8 @@ class SignInForm extends Component {
                     <br/>
               </Card>
              </Col>
-             <Col xs={2} md={3}></Col>
-        </Row>
+
+
     </Grid>
     );
   }
