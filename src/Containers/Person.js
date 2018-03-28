@@ -5,7 +5,8 @@ import  PasswordForgetPage  from './passwordForget';
 import {Row, Col, Grid} from 'react-bootstrap';
 import Avatar from 'material-ui/Avatar';
 import FontIcon from 'material-ui/FontIcon';
-import CryptoCard from '../Components/card'
+import CryptoCard from '../Components/card';
+import ExpandableCoinList from '../Components/expandableCoinList';
 
 const AvatarStyle = {
   border: 0,
@@ -54,6 +55,10 @@ const Person = (props, {authUser}) =>
 </Row>
 
 <Row>
+<ExpandableCoinList/>
+</Row>
+
+<Row>
 <h3>Your Cards</h3>
 </Row>
 
@@ -62,17 +67,17 @@ const Person = (props, {authUser}) =>
 <CryptoCard/>
 <CryptoCard/>
 <CryptoCard/>
-<CryptoCard/>
 
 
 </Row>
 
+<Row>
+  <h1>Account: {authUser.email} </h1>
+  <p>The Account Page is accessible by every signed in user.</p>
+  < PasswordForgetPage />
+</Row>
 
-  <div>
-    <h1>Account: {authUser.email} </h1>
-    <p>The Account Page is accessible by every signed in user.</p>
-    < PasswordForgetPage />
-  </div>
+
 
 
 </div>
@@ -80,6 +85,9 @@ const Person = (props, {authUser}) =>
 Person.contextTypes = {
   authUser: PropTypes.object,
 };
+
+
+
 
 const authCondition = (authUser) => !!authUser;
 export default withAuthorization(authCondition)(Person);

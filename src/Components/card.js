@@ -4,6 +4,8 @@ import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'mat
 import FlatButton from 'material-ui/FlatButton';
 import Chip from 'material-ui/Chip';
 import Divider from 'material-ui/Divider';
+//import { FlipCard } from 'react-flop-card';
+
 
 import {
   Table,
@@ -25,13 +27,53 @@ import {
     },
   };
 
-export default class CryptoCard extends Component {
+export default class CryptoCard extends Component{
+  constructor(){
+    super();
+    this.state ={
+      flipped: ''
+    }
+    this.flipCardOnClick = this.flipCardOnClick.bind(this)
+  }
 
+  flipCardOnClick(){
+    if(this.state.flipped===''){
+    this.setState({
+      flipped: 'flipped'
+    })
+  } else {
+    this.setState({
+      flipped: ''
+    })
+  }
+  }
+
+  render(){
+    return(
+
+<Col md={4}>
+  <section className="FlipContainer">
+    <div id="card" className={this.state.flipped}>
+      <CryptoCardFront OnFlipButtonClick={this.flipCardOnClick}/>
+      <CryptoCardBack OnFlipButtonClick={this.flipCardOnClick}/>
+    </div>
+  </section>
+</Col>
+    )
+  }
+}
+
+ class CryptoCardFront extends Component {
+constructor(props){
+  super(props);
+}
 
   render() {
     return (
-      <Col md={4}>
-        <Card className='CryptoCardUI'>
+
+
+
+        <Card className='CryptoCardUI front'>
 
      <CardTitle
        style={{borderRadius: '6px 6px 0 0'}}
@@ -48,14 +90,14 @@ export default class CryptoCard extends Component {
 
       </CardTitle>
 
-     <CardText>
+     <CardText style={{padding: '0px'}}>
        <TableExampleComplex/>
      </CardText>
      <CardActions>
        <Divider/>
        <Row>
          <Col md={6} xs={6}>
-           <FlatButton label="MORE INFO" />
+           <FlatButton label="MORE INFO" onClick={this.props.OnFlipButtonClick} />
          </Col>
 
          <Col md={3} xs={3}>
@@ -68,10 +110,65 @@ export default class CryptoCard extends Component {
        </Row>
      </CardActions>
    </Card>
-     </Col>
+
+
     )
   }
 }
+
+
+class CryptoCardBack extends Component {
+
+
+
+ render() {
+   return (
+
+
+
+  <Card className='CryptoCardUI back'>
+
+  <CardTitle
+  style={{borderRadius: '6px 6px 0 0'}}
+  className='CardHeaderBack'>
+  <Row>
+   <Col md={6} sm={9} lg={6}>
+     <p style={{fontSize: '20pt'}}>Title</p>
+   </Col>
+
+   <Col md={6} sm={3} lg={6}>
+     <Chip className='center-block'>1000</Chip>
+   </Col>
+  </Row>
+
+  </CardTitle>
+
+  <CardText style={{height: '210px'}}>
+  <h1>Back side graph here</h1>
+  </CardText>
+  <CardActions>
+  <Divider/>
+  <Row>
+   <Col md={6} xs={6}>
+     <FlatButton label="MORE INFO" onClick={this.props.OnFlipButtonClick} />
+   </Col>
+
+   <Col md={3} xs={3}>
+     <FlatButton label="SELL" />
+   </Col>
+
+   <Col md={3} xs={3}>
+     <FlatButton label="ADD NEW" primary={true} />
+   </Col>
+  </Row>
+  </CardActions>
+  </Card>
+
+
+   )
+ }
+}
+
 
 const TableStyles = {
   propContainer: {
