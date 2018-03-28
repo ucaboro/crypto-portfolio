@@ -15,6 +15,10 @@ min-width: 275px;
 
 }
 
+.body{
+  background: red;
+}
+
 
 .card {
   background: #fff;
@@ -24,6 +28,19 @@ min-width: 275px;
   margin-top: 1rem;
   position: relative;
   width: 100%;
+}
+
+.CryptoCardUI{
+  border-radius: 6px;
+  margin-top: 30px;
+
+}
+.CardHeader{
+background: #7db9e8; /* Old browsers */
+background: -moz-linear-gradient(left, #7db9e8 0%, #1e5799 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(left, #7db9e8 0%,#1e5799 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to right, #7db9e8 0%,#1e5799 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7db9e8', endColorstr='#1e5799',GradientType=1 ); /* IE6-9 */
 }
 
 .card-1 {
@@ -38,6 +55,16 @@ min-width: 275px;
 
 .App {
   text-align: center;
+}
+
+.center-block {
+  margin-left:auto !important;
+  margin-right:auto !important;
+  display:block !important;
+}
+
+.text-center {
+  text-align:center !important;
 }
 
 .App-logo {

@@ -5,6 +5,7 @@ import  PasswordForgetPage  from './passwordForget';
 import {Row, Col, Grid} from 'react-bootstrap';
 import Avatar from 'material-ui/Avatar';
 import FontIcon from 'material-ui/FontIcon';
+import CryptoCard from '../Components/card'
 
 const AvatarStyle = {
   border: 0,
@@ -30,7 +31,7 @@ const Person = (props, {authUser}) =>
 <Row style={{marginTop: '-95px'}}>
   <Col lg={5} md={4} sm={6} className='InvestedSheetCol'>
     <div className='card card-1'>
-      <p>hey</p>
+      <p>Invested</p>
     </div>
   </Col>
 
@@ -46,9 +47,23 @@ const Person = (props, {authUser}) =>
 
   <Col   lg={5} md={4} sm={6} className='ProfitSheetCol'>
     <div className='card card-1'>
-      <p>hey2</p>
+      <p>Profit</p>
     </div>
   </Col>
+
+</Row>
+
+<Row>
+<h3>Your Cards</h3>
+</Row>
+
+<Row>
+
+<CryptoCard/>
+<CryptoCard/>
+<CryptoCard/>
+<CryptoCard/>
+
 
 </Row>
 
