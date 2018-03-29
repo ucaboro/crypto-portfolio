@@ -35,14 +35,12 @@ export default class ExpandableCoinList extends Component {
     })
   }
 
-
-    //this.state.expanded ? ExpandableCoinListStyles.height='100%' : ''
   }
 
   render(){
     return (
     <div>
-      <FlatButton label={this.state.buttonLabel} primary={true} onClick={this.expandCoinList}/>
+      <FlatButton label={this.state.buttonLabel} primary={true} onClick={this.expandCoinList} style={{marginTop:'10px'}}/>
       <div className="center-block" id="expandableList" style={{maxHeight: this.state.expanded, maxWidth: this.state.expanded}}>
         <TableExampleSimple/>
       </div>

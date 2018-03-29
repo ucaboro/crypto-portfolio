@@ -64,9 +64,16 @@ const Person = (props, {authUser}) =>
 
 <Row>
 
-<CryptoCard/>
-<CryptoCard/>
-<CryptoCard/>
+<CryptoCard
+  tableData={tableData}
+  priceChange="1,000$"
+  frontTitle="COINBASE"
+  backGraph="Graph on the back of the card 📈"/>
+
+<CryptoCard  tableData={tableData2} priceChange="734$" frontTitle="binance"/>
+<CryptoCard  priceChange="1,340$" frontTitle="metamask"/>
+
+
 
 
 </Row>
@@ -86,6 +93,47 @@ Person.contextTypes = {
   authUser: PropTypes.object,
 };
 
+const tableData = [
+  {
+    coin: 'BTC',
+    amount: '0.45',
+    value: '10000$'
+  },
+  {
+    coin: 'ETH',
+    amount: '12.45',
+    value: '8000$'
+  },
+  {
+    coin: 'EOS',
+    amount: '115',
+    value: '1150$'
+  },
+  {
+    coin: 'LTC',
+    amount: '3.12',
+    value: '900$'
+  },
+  {
+    coin: 'ADA',
+    amount: '98',
+    value: '867$'
+  },
+];
+
+const tableData2 = [
+  {
+    coin: 'EOS',
+    amount: '150',
+    value: '10000$'
+  },
+  {
+    coin: 'ETH',
+    amount: '18.74',
+    value: '8200$'
+  },
+
+];
 
 
 

@@ -28,8 +28,8 @@ import {
   };
 
 export default class CryptoCard extends Component{
-  constructor(){
-    super();
+  constructor(props){
+    super(props);
     this.state ={
       flipped: ''
     }
@@ -53,9 +53,9 @@ export default class CryptoCard extends Component{
 
 <Col md={4}>
   <section className="FlipContainer">
-    <div id="card" className={this.state.flipped}>
-      <CryptoCardFront OnFlipButtonClick={this.flipCardOnClick}/>
-      <CryptoCardBack OnFlipButtonClick={this.flipCardOnClick}/>
+    <div id="card"  className={this.state.flipped}>
+      <CryptoCardFront tableData={this.props.tableData} priceChange={this.props.priceChange} frontTitle={this.props.frontTitle.toUpperCase()} OnFlipButtonClick={this.flipCardOnClick}/>
+      <CryptoCardBack priceChange={this.props.priceChange} backGraph={this.props.backGraph} frontTitle={this.props.frontTitle.toUpperCase()} OnFlipButtonClick={this.flipCardOnClick}/>
     </div>
   </section>
 </Col>
@@ -76,22 +76,23 @@ constructor(props){
         <Card className='CryptoCardUI front'>
 
      <CardTitle
-       style={{borderRadius: '6px 6px 0 0'}}
+       style={{borderRadius: '6px 6px 0 0', color: 'white'}}
        className='CardHeader'>
        <Row>
          <Col md={6} sm={9} lg={6}>
-           <p style={{fontSize: '20pt'}}>Title</p>
+           <p style={{fontSize: '20pt'}}>{this.props.frontTitle}</p>
          </Col>
 
          <Col md={6} sm={3} lg={6}>
-           <Chip className='center-block'>1000</Chip>
+           <Chip className='center-block'>{this.props.priceChange}</Chip>
          </Col>
        </Row>
 
       </CardTitle>
 
      <CardText style={{padding: '0px'}}>
-       <TableExampleComplex/>
+
+       <TableExampleComplex tableData={this.props.tableData}/>
      </CardText>
      <CardActions>
        <Divider/>
@@ -129,22 +130,22 @@ class CryptoCardBack extends Component {
   <Card className='CryptoCardUI back'>
 
   <CardTitle
-  style={{borderRadius: '6px 6px 0 0'}}
+  style={{borderRadius: '6px 6px 0 0', color: 'white'}}
   className='CardHeaderBack'>
   <Row>
    <Col md={6} sm={9} lg={6}>
-     <p style={{fontSize: '20pt'}}>Title</p>
+     <p style={{fontSize: '20pt'}}>{this.props.frontTitle}</p>
    </Col>
 
    <Col md={6} sm={3} lg={6}>
-     <Chip className='center-block'>1000</Chip>
+     <Chip className='center-block'>{this.props.priceChange}</Chip>
    </Col>
   </Row>
 
   </CardTitle>
 
   <CardText style={{height: '210px'}}>
-  <h1>Back side graph here</h1>
+  <h1>{this.props.backGraph}</h1>
   </CardText>
   <CardActions>
   <Divider/>
@@ -181,35 +182,12 @@ const TableStyles = {
   },
 };
 
-const tableData = [
-  {
-    coin: 'BTC',
-    amount: '0.45',
-    value: '10000$'
-  },
-  {
-    coin: 'ETH',
-    amount: '12.45',
-    value: '8000$'
-  },
-  {
-    coin: 'EOS',
-    amount: '115',
-    value: '1150$'
-  },
-  {
-    coin: 'LTC',
-    amount: '3.12',
-    value: '900$'
-  },
-  {
-    coin: 'ADA',
-    amount: '98',
-    value: '867$'
-  },
-];
+
 
 class TableExampleComplex extends Component {
+  constructor(props){
+    super(props);
+  }
   state = {
     fixedHeader: true,
     fixedFooter: false,
@@ -226,6 +204,18 @@ class TableExampleComplex extends Component {
 
 
   render() {
+
+    let data = ''
+    if(this.props.tableData != undefined){
+      data= this.props.tableData.map( (row, index) => (
+        <TableRow key={index}>
+          <TableRowColumn>{row.coin}</TableRowColumn>
+          <TableRowColumn>{row.amount}</TableRowColumn>
+          <TableRowColumn>{row.value}</TableRowColumn>
+        </TableRow>
+      ))
+    }
+
     return (
       <div>
         <Table
@@ -252,13 +242,7 @@ class TableExampleComplex extends Component {
             showRowHover={this.state.showRowHover}
             stripedRows={this.state.stripedRows}
           >
-            {tableData.map( (row, index) => (
-              <TableRow key={index}>
-                <TableRowColumn>{row.coin}</TableRowColumn>
-                <TableRowColumn>{row.amount}</TableRowColumn>
-                <TableRowColumn>{row.value}</TableRowColumn>
-              </TableRow>
-              ))}
+              {data}
           </TableBody>
 
         </Table>
