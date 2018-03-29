@@ -38,23 +38,23 @@ const NavigationNonAuth = () => <div>
       <Nav>
         <LinkContainer to={routes.ABOUT}>
           <NavItem eventKey={1}>
-          About
+          About ❓
         </NavItem>
         </LinkContainer>
       </Nav>
       <Nav pullRight>
         <LinkContainer to={routes.SIGN_IN}>
         <NavItem eventKey={1}>
-          Sign In
+          Sign In 🔑
         </NavItem>
         </LinkContainer>
         <LinkContainer to={routes.REGISTER}>
         <NavItem eventKey={2}>
-          Register
+          Register 📝
         </NavItem>
         </LinkContainer>
         <NavItem eventKey={3}>
-          Language
+          Language 🌐
         </NavItem>
       </Nav>
     </Navbar.Collapse>
@@ -76,23 +76,23 @@ const NavigationAuth = () => <div>
       <Nav>
         <LinkContainer to={routes.ABOUT}>
         <NavItem eventKey={1}>
-          About
+          About ❓
         </NavItem>
         </LinkContainer>
         <LinkContainer to={routes.ACCOUNT}>
         <NavItem eventKey={1}>
-          Personal
+          Personal 👤
         </NavItem>
         </LinkContainer>
       </Nav>
 
       <Nav pullRight>
         <NavItem eventKey={5} onClick={auth.doSignOut}>
-          Sign Out
+          Sign Out 🔒
         </NavItem>
 
         <NavItem eventKey={3} >
-          Language
+          Language 🌐
         </NavItem>
 
       </Nav>

@@ -59,7 +59,7 @@ const Person = (props, {authUser}) =>
 </Row>
 
 <Row>
-<h3>Your Cards</h3>
+<h3>Your Cards 💵 </h3>
 </Row>
 
 <Row>

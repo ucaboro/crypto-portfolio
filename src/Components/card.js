@@ -97,7 +97,7 @@ constructor(props){
        <Divider/>
        <Row>
          <Col md={6} xs={6}>
-           <FlatButton label="MORE INFO" onClick={this.props.OnFlipButtonClick} />
+           <FlatButton label="MORE 📊" onClick={this.props.OnFlipButtonClick} />
          </Col>
 
          <Col md={3} xs={3}>
@@ -150,7 +150,7 @@ class CryptoCardBack extends Component {
   <Divider/>
   <Row>
    <Col md={6} xs={6}>
-     <FlatButton label="MORE INFO" onClick={this.props.OnFlipButtonClick} />
+     <FlatButton label="BACK" onClick={this.props.OnFlipButtonClick} />
    </Col>
 
    <Col md={3} xs={3}>
