@@ -7,12 +7,24 @@ import Avatar from 'material-ui/Avatar';
 import FontIcon from 'material-ui/FontIcon';
 import CryptoCard from '../Components/card';
 import ExpandableCoinList from '../Components/expandableCoinList';
+import AccountTable from '../Components/accountTable';
+import Divider from 'material-ui/Divider';
+
 
 const AvatarStyle = {
   border: 0,
   objectFit: 'cover',
 }
 
+function calculateOverallInvestment(obj){
+  let sum = 0;
+  for(let i=0; i<obj.length; i++){
+    sum=sum+obj[i].investment;
+    console.log(sum)
+  }
+
+  return sum;
+}
 
 const Person = (props, {authUser}) =>
 <div>
@@ -32,7 +44,11 @@ const Person = (props, {authUser}) =>
 <Row style={{marginTop: '-95px'}}>
   <Col lg={5} md={4} sm={6} className='InvestedSheetCol'>
     <div className='card card-1'>
-      <p>Invested</p>
+      <h4>Invested</h4>
+      <AccountTable tableData={investData}/>
+      <Divider/>
+      <h5 className='investAmount'>={calculateOverallInvestment(investData)} $</h5>
+
     </div>
   </Col>
 
@@ -65,12 +81,12 @@ const Person = (props, {authUser}) =>
 <Row>
 
 <CryptoCard
-  tableData={tableData}
+  tableData={cardData}
   priceChange="1,000$"
   frontTitle="COINBASE"
   backGraph="Graph on the back of the card 📈"/>
 
-<CryptoCard  tableData={tableData2} priceChange="734$" frontTitle="binance"/>
+<CryptoCard  tableData={cardData2} priceChange="734$" frontTitle="binance"/>
 <CryptoCard  priceChange="1,340$" frontTitle="metamask"/>
 
 
@@ -93,7 +109,40 @@ Person.contextTypes = {
   authUser: PropTypes.object,
 };
 
-const tableData = [
+const investData = [
+  {
+    investment: 1000,
+    coin: 'BTC',
+    amount: '0.2'
+  },
+  {
+    investment: 500,
+    coin: 'ETH',
+    amount: '1.3'
+  },
+  {
+    investment: 1000,
+    coin: 'EOS',
+    amount: '100'
+  },
+  {
+    investment: 250,
+    coin: 'LTC',
+    amount: '1.2'
+  },
+  {
+    investment: 1250,
+    coin: 'LTC',
+    amount: '1.2'
+  },
+  {
+    investment: 100,
+    coin: 'LTC',
+    amount: '1.2'
+  },
+];
+
+const cardData = [
   {
     coin: 'BTC',
     amount: '0.45',
@@ -121,7 +170,7 @@ const tableData = [
   },
 ];
 
-const tableData2 = [
+const cardData2 = [
   {
     coin: 'EOS',
     amount: '150',

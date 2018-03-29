@@ -49,43 +49,68 @@ export default class ExpandableCoinList extends Component {
   }
 }
 
+function colorNum(num){
+  if(num.charAt(0)==='-'){
+    return '#B71C1C'
+  } else{
+    return '#388E3C'
+  }
+}
 
 
 const TableExampleSimple = () => (
   <Table>
     <TableHeader>
       <TableRow>
-        <TableHeaderColumn>ID</TableHeaderColumn>
-        <TableHeaderColumn>Name</TableHeaderColumn>
-        <TableHeaderColumn>Status</TableHeaderColumn>
+        <TableHeaderColumn>Rank</TableHeaderColumn>
+        <TableHeaderColumn>Coin</TableHeaderColumn>
+        <TableHeaderColumn>MarketCap</TableHeaderColumn>
+        <TableHeaderColumn>Price</TableHeaderColumn>
+        <TableHeaderColumn>Change {'24hr'}</TableHeaderColumn>
       </TableRow>
     </TableHeader>
     <TableBody>
-      <TableRow>
-        <TableRowColumn>1</TableRowColumn>
-        <TableRowColumn>John Smith</TableRowColumn>
-        <TableRowColumn>Employed</TableRowColumn>
-      </TableRow>
-      <TableRow>
-        <TableRowColumn>2</TableRowColumn>
-        <TableRowColumn>Randal White</TableRowColumn>
-        <TableRowColumn>Unemployed</TableRowColumn>
-      </TableRow>
-      <TableRow>
-        <TableRowColumn>3</TableRowColumn>
-        <TableRowColumn>Stephanie Sanders</TableRowColumn>
-        <TableRowColumn>Employed</TableRowColumn>
-      </TableRow>
-      <TableRow>
-        <TableRowColumn>4</TableRowColumn>
-        <TableRowColumn>Steve Brown</TableRowColumn>
-        <TableRowColumn>Employed</TableRowColumn>
-      </TableRow>
-      <TableRow>
-        <TableRowColumn>5</TableRowColumn>
-        <TableRowColumn>Christopher Nolan</TableRowColumn>
-        <TableRowColumn>Unemployed</TableRowColumn>
-      </TableRow>
+      {tableData.map( (row, index) => (
+              <TableRow key={index}>
+                <TableRowColumn>{index+1}</TableRowColumn>
+                <TableRowColumn>{row.coin}</TableRowColumn>
+                <TableRowColumn>{row.marketCap}</TableRowColumn>
+                <TableRowColumn>{row.price}</TableRowColumn>
+                <TableRowColumn style={{color:colorNum(row.change)}}>{row.change}</TableRowColumn>
+              </TableRow>
+              ))}
     </TableBody>
   </Table>
 );
+
+function addEmoji(num){
+  if(num>0){
+  return '+'+num+'%'+'📈'
+} else {
+  return num+'%'+'📉'
+}
+
+
+}
+
+const tableData = [
+
+  {
+    coin: 'BTC',
+    price: '10,000$',
+    marketCap: '125,862,406,273.35',
+    change: addEmoji(-1.2),
+  },
+  {
+    coin: 'ETH',
+    price: '800$',
+    marketCap: '125,862,406,273.35',
+    change: addEmoji(+3.1),
+  },
+  {
+    coin: 'EOS',
+    price: '100$',
+    marketCap: '125,862,406,273.35',
+    change: addEmoji(-4.2),
+  },
+];

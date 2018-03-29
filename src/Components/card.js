@@ -4,9 +4,6 @@ import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'mat
 import FlatButton from 'material-ui/FlatButton';
 import Chip from 'material-ui/Chip';
 import Divider from 'material-ui/Divider';
-//import { FlipCard } from 'react-flop-card';
-
-
 import {
   Table,
   TableBody,
