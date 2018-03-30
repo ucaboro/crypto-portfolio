@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Component} from 'react';
 import withAuthorization from '../Components/withAuthorization';
 import PropTypes from 'prop-types';
 import  PasswordForgetPage  from './passwordForget';
@@ -9,6 +9,8 @@ import CryptoCard from '../Components/card';
 import ExpandableCoinList from '../Components/expandableCoinList';
 import AccountTable from '../Components/accountTable';
 import Divider from 'material-ui/Divider';
+import Chip from 'material-ui/Chip';
+
 
 
 const AvatarStyle = {
@@ -16,15 +18,34 @@ const AvatarStyle = {
   objectFit: 'cover',
 }
 
-function calculateOverallInvestment(obj){
+let Profit = 0;
+let Invested = 0;
+
+function formatProfit(num1, num2){
+  let profit = num1 - num2;
+  if (profit>0){
+    return "+"+profit+ " $"
+  }else{
+    return "-"+profit+' $'
+  }
+
+}
+
+function calculateOverallInvestment(obj, prop){
   let sum = 0;
   for(let i=0; i<obj.length; i++){
-    sum=sum+obj[i].investment;
-    console.log(sum)
+    sum=sum+obj[i][prop];
+  }
+
+  if(prop==="investment"){
+    Invested = sum;
+  } else {
+    Profit = sum;
   }
 
   return sum;
 }
+
 
 const Person = (props, {authUser}) =>
 <div>
@@ -45,9 +66,13 @@ const Person = (props, {authUser}) =>
   <Col lg={5} md={4} sm={6} className='InvestedSheetCol'>
     <div className='card card-1'>
       <h4>Invested</h4>
-      <AccountTable tableData={investData}/>
-      <Divider/>
-      <h5 className='investAmount'>={calculateOverallInvestment(investData)} $</h5>
+      <AccountTable
+        column1="Investment"
+        column2="Coin"
+        column3="Amount"
+        mappedRows="investment"
+        tableData={investData}/>
+      <h5 className='text-center'>{calculateOverallInvestment(investData, 'investment')} $</h5>
 
     </div>
   </Col>
@@ -64,7 +89,29 @@ const Person = (props, {authUser}) =>
 
   <Col   lg={5} md={4} sm={6} className='ProfitSheetCol'>
     <div className='card card-1'>
-      <p>Profit</p>
+      <Row>
+        <Col md={8} lg={8} sm={8} xs={8}>
+          <h4 className="portfolioTitle">Portfolio</h4>
+        </Col>
+
+        <Col md={4} lg={4} sm={4} xs={4}>
+          <Chip style={{marginTop:'5px', marginBottom: '5px'}}>
+            {formatProfit(calculateOverallInvestment(profitData, 'currentValue'),Invested)}
+          </Chip>
+        </Col>
+      </Row>
+
+        <AccountTable
+          column1="Coin"
+          column2="Amount"
+          column3="Current value"
+          mappedRows="profit"
+          tableData={profitData}/>
+
+        <h5 className="text-center">
+          {Profit} $
+        </h5>
+
     </div>
   </Col>
 
@@ -108,6 +155,30 @@ const Person = (props, {authUser}) =>
 Person.contextTypes = {
   authUser: PropTypes.object,
 };
+
+const profitData = [
+  {
+    coin: 'BTC',
+    amount: '0.5',
+    currentValue: 1000
+  },
+  {
+    coin: 'ETH',
+    amount: '1.5',
+    currentValue: 1000
+  },
+  {
+    coin: 'LTC',
+    amount: '2.5',
+    currentValue: 1000
+  },
+  {
+    coin: 'EOS',
+    amount: '100',
+    currentValue: 1254
+  },
+
+];
 
 const investData = [
   {

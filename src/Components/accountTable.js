@@ -16,7 +16,15 @@ export default class AccountTable extends Component{
 
   render(){
     return(
-      <TableExampleComplex tableData={this.props.tableData}/>
+      <TableExampleComplex
+      column1={this.props.column1}
+      column2={this.props.column2}
+      column3={this.props.column3}
+      tooltip1={this.props.tooltip1}
+      tooltip2={this.props.tooltip2}
+      tooltip3={this.props.tooltip3}
+      mappedRows={this.props.mappedRows}
+      tableData={this.props.tableData}/>
     )
   }
 }
@@ -45,13 +53,23 @@ class TableExampleComplex extends Component {
 
     let data = ''
     if(this.props.tableData != undefined){
+      if(this.props.mappedRows==='investment'){
       data= this.props.tableData.map( (row, index) => (
         <TableRow key={index}>
-          <TableRowColumn>{row.investment+' $'}</TableRowColumn>
+          <TableRowColumn>{row.investment}</TableRowColumn>
           <TableRowColumn>{row.coin}</TableRowColumn>
           <TableRowColumn>{row.amount}</TableRowColumn>
         </TableRow>
       ))
+    }else if(this.props.mappedRows==='profit'){
+      data= this.props.tableData.map( (row, index) => (
+        <TableRow key={index}>
+          <TableRowColumn>{row.coin}</TableRowColumn>
+          <TableRowColumn>{row.amount}</TableRowColumn>
+          <TableRowColumn>{row.currentValue}</TableRowColumn>
+        </TableRow>
+      ))
+    }
     }
 
     return (
@@ -69,9 +87,9 @@ class TableExampleComplex extends Component {
             enableSelectAll={this.state.enableSelectAll}
           >
             <TableRow>
-              <TableHeaderColumn tooltip="Invested amount">Investment</TableHeaderColumn>
-              <TableHeaderColumn tooltip="Cryptocurrency">Coin</TableHeaderColumn>
-              <TableHeaderColumn tooltip="Coin amount">Amount</TableHeaderColumn>
+              <TableHeaderColumn tooltip={this.props.tooltip1}>{this.props.column1}</TableHeaderColumn>
+              <TableHeaderColumn tooltip={this.props.tooltip2}>{this.props.column2}</TableHeaderColumn>
+              <TableHeaderColumn tooltip={this.props.tooltip3}>{this.props.column3}</TableHeaderColumn>
             </TableRow>
           </TableHeader>
           <TableBody

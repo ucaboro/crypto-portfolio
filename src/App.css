@@ -8,10 +8,22 @@ margin-top: -50px;
 min-width: 275px;
 }
 
+.portfolioTitle{
+  text-align: right !important;
+}
+
 .investAmount{
   text-align: left !important;
   margin-left: 24px;
-font-weight: bold;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.profitAmount{
+  text-align: right !important;
+  margin-right: 84px;
+  font-weight: bold;
+  margin-top: 20px;
 }
 
 
