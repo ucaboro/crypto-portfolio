@@ -7,6 +7,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
+import ExpandableCoinList from './Components/expandableCoinList'
 
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
