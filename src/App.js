@@ -12,7 +12,7 @@ import Navigation from './Components/navbar.js'
 
 import Main from './Containers/Main.js'
 import About from './Containers/About.js'
-import Person from './Containers/Person.js'
+import Account from './Containers/Person.js'
 import PasswordForgetPage from './Containers/passwordForget.js'
 import SignInPage from './Containers/SignIn.js'
 import Register from './Containers/Register.js'
@@ -49,7 +49,7 @@ class App extends Component {
         <Route exact path={routes.REGISTER} component={Register}/>
         <Route exact path={routes.SIGN_IN} component={SignInPage}/>
         <Route exact path={routes.PASSWORD_FORGET} component={PasswordForgetPage}/>
-        <Route exact path={routes.ACCOUNT} component={Person}/>
+        <Route exact path={routes.ACCOUNT} component={Account}/>
         <Route exact path={routes.ABOUT} component={About}/>
       </div>
     </Router>);

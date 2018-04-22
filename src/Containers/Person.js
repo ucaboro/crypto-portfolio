@@ -10,8 +10,53 @@ import ExpandableCoinList from '../Components/expandableCoinList';
 import AccountTable from '../Components/accountTable';
 import Divider from 'material-ui/Divider';
 import Chip from 'material-ui/Chip';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
+import AddSign from 'material-ui/svg-icons/content/add';
+import AddCryptoCard from '../Components/addCard'
 
+class Account extends Component{
+  constructor(props){
+    super(props)
+  this.state={
+    dimmer: '0',
+    dimmerHeight: '0%',
+    showAddCard: false
+  }
+  this.addNewCard = this.addNewCard.bind(this)
+  this.createNewCard = this.createNewCard.bind(this)
+  }
 
+createNewCard(){
+
+  this.setState({
+    dimmer: '0',
+    dimmerHeight: '0%',
+    showAddCard: false,
+  })
+}
+
+ addNewCard(){
+  this.setState({
+    dimmer: '0.7',
+    dimmerHeight: '100%',
+    showAddCard: true
+  })
+
+  }
+
+  render(){
+    return(
+      <div>
+      <div className= "pageDimmer" style={{opacity: this.state.dimmer, height: this.state.dimmerHeight}}/>
+      <Person
+        onAddCircleClick={this.addNewCard}
+        showAddCard={this.state.showAddCard}
+        onCreateClick={this.createNewCard}
+        />
+      </div>
+    )
+  }
+}
 
 const AvatarStyle = {
   border: 0,
@@ -45,6 +90,8 @@ function calculateOverallInvestment(obj, prop){
 
   return sum;
 }
+
+
 
 
 const Person = (props, {authUser}) =>
@@ -117,9 +164,11 @@ const Person = (props, {authUser}) =>
 
 </Row>
 
+{/*
 <Row>
 <ExpandableCoinList/>
 </Row>
+*/}
 
 <Row>
 <h3>Your Cards 💵 </h3>
@@ -134,7 +183,13 @@ const Person = (props, {authUser}) =>
   backGraph="Graph on the back of the card 📈"/>
 
 <CryptoCard  tableData={cardData2} priceChange="734$" frontTitle="binance"/>
-<CryptoCard  priceChange="1,340$" frontTitle="metamask"/>
+<CryptoCard  tableData={cardData2} priceChange="213$" frontTitle="tracking"/>
+
+{props.showAddCard ?
+  <AddCryptoCard onCreateClick={props.onCreateClick}/>
+  :
+  <AddCryptoCardButton onAddCircleClick={props.onAddCircleClick}/>
+}
 
 
 
@@ -155,6 +210,14 @@ const Person = (props, {authUser}) =>
 Person.contextTypes = {
   authUser: PropTypes.object,
 };
+
+const AddCryptoCardButton = (props) =>
+<Col md={4}>
+  <FloatingActionButton onClick={props.onAddCircleClick} backgroundColor='#1e5799' className="addCardButton">
+    <AddSign/>
+  </FloatingActionButton>
+</Col>
+
 
 const profitData = [
   {
@@ -257,5 +320,7 @@ const cardData2 = [
 
 
 
+
+
 const authCondition = (authUser) => !!authUser;
-export default withAuthorization(authCondition)(Person);
+export default withAuthorization(authCondition)(Account);

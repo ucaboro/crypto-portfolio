@@ -1,4 +1,18 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto');
+.pageDimmer {
+  position: fixed;
+  background-color: black;
+  height: 100%;
+  width: 100%;
+  z-index: 5;
+  margin-top: -52px;
+  -webkit-transition: opacity 0.5s ease-in-out;
+  -moz-transition: opacity 0.5s ease-in-out;
+  transition: opacity 0.5s ease-in-out;
+
+
+}
+
 
 .Features{
 margin-top: -50px;
@@ -81,6 +95,11 @@ transition: max-height 0.45s ease-out;
   transform: rotateY( 180deg );
 }
 
+@media (min-width: 992px) {
+  .addCardButton{
+  margin-top: 150px;
+  }
+}
 
 
 .card {
@@ -95,7 +114,7 @@ transition: max-height 0.45s ease-out;
 }
 
 .CryptoCardUI{
-  border-radius: 6px;
+  border-radius: 10px 10px 7px 7px !important;
 }
 
 .CardHeader{
