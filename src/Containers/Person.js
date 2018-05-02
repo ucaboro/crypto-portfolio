@@ -12,27 +12,82 @@ import Divider from 'material-ui/Divider';
 import Chip from 'material-ui/Chip';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import AddSign from 'material-ui/svg-icons/content/add';
-import AddCryptoCard from '../Components/addCard'
+import AddCryptoCard from '../Components/addCard';
+import {db, auth} from '../firebase/firebase';
+import {getUserCards, addCard, getAllCards, snapshotToArray} from '../firebase/db';
+import CircularProgress from 'material-ui/CircularProgress';
+
 
 class Account extends Component{
+
   constructor(props){
     super(props)
   this.state={
     dimmer: '0',
     dimmerHeight: '0%',
-    showAddCard: false
+    showAddCard: false,
+    cardName: '',
+    cards: '',
+    cardLoaded: false,
   }
   this.addNewCard = this.addNewCard.bind(this)
   this.createNewCard = this.createNewCard.bind(this)
+  this.changeCardName=this.changeCardName.bind(this)
+  this.removeDimmer = this.removeDimmer.bind(this)
   }
 
+  componentWillMount(){
+    const userCards = db.ref().child(auth.currentUser.uid);
+userCards.on('value', snap => {
+      let cards =  snapshotToArray(snap);
+      this.setState({
+        cards
+      })
+    });
+  }
+
+  componentDidMount(){
+    this.setState({cardLoaded: true})
+  }
+
+  changeCardName(e){
+    this.setState({
+      cardName: e.target.value
+    })
+  }
+
+  onEnter = (e) =>{
+      if(e.key === 'Enter'){
+        this.createNewCard()
+    }
+  }
+
+removeDimmer(){
+  this.setState({
+    dimmer: '0',
+    dimmerHeight: '0%',
+    showAddCard: false,
+    cardName: ''
+  })
+}
+
 createNewCard(){
+
+//condition to ensure the card name is entered
+if(this.state.cardName.length!=0){
+  addCard(auth.currentUser.uid, this.state.cardName)
 
   this.setState({
     dimmer: '0',
     dimmerHeight: '0%',
     showAddCard: false,
+    cardName: ''
   })
+} else {
+  alert('you need to create a name for the card')
+}
+
+
 }
 
  addNewCard(){
@@ -41,17 +96,25 @@ createNewCard(){
     dimmerHeight: '100%',
     showAddCard: true
   })
-
   }
 
+
+
+
+
   render(){
+
     return(
       <div>
-      <div className= "pageDimmer" style={{opacity: this.state.dimmer, height: this.state.dimmerHeight}}/>
+      <div onClick = {this.removeDimmer} className= "pageDimmer" style={{opacity: this.state.dimmer, height: this.state.dimmerHeight}}/>
       <Person
         onAddCircleClick={this.addNewCard}
         showAddCard={this.state.showAddCard}
         onCreateClick={this.createNewCard}
+        changeCardName = {this.changeCardName}
+        cards = {this.state.cards}
+        onKeyPress = {this.onEnter}
+        cardLoaded = {this.state.cardLoaded}
         />
       </div>
     )
@@ -93,123 +156,160 @@ function calculateOverallInvestment(obj, prop){
 
 
 
+class Person extends Component{
+  constructor(props, {authUser}){
+  super(props, {authUser})
 
-const Person = (props, {authUser}) =>
-<div>
-  <header style={{height: '200px'}} className="App-header"/>
+}
 
 
-  <Row >
-    <Col sm={12} mdHidden  lgHidden style={{marginTop: '-195px'}} >
-    <Avatar
-     src="https://naqyr37xcg93tizq734pqsx1-wpengine.netdna-ssl.com/wp-content/uploads/2016/01/76-Intelligent-Richard-Branson-Quotes.jpg"
-     size={100}
-     style={AvatarStyle}
-      />
-    </Col>
-  </Row>
 
-<Row style={{marginTop: '-95px'}}>
-  <Col lg={5} md={4} sm={6} className='InvestedSheetCol'>
-    <div className='card card-1'>
-      <h4>Invested</h4>
-      <AccountTable
-        column1="Investment"
-        column2="Coin"
-        column3="Amount"
-        mappedRows="investment"
-        tableData={investData}/>
-      <h5 className='text-center'>{calculateOverallInvestment(investData, 'investment')} $</h5>
+render(){
+  let plusIcon = ''
 
-    </div>
-  </Col>
+  let cards = []
+  let list = this.props.cards;
+  for (let value of list){
+    cards.push(<CryptoCard key={value.key} cardKey={value.key} frontTitle={value.name}/>)
+  }
 
-  <Col xsHidden smHidden lg={2} md={4} className='AvatarCol'>
+//setting up logic for plusIcon to appear only after cards are loaded
+  if(cards.length!=0){
+    plusIcon = (    this.props.showAddCard ?
+          <AddCryptoCard changeCardName = {this.props.changeCardName} onKeyPress={this.props.onKeyPress} onCreateClick={this.props.onCreateClick}/>
+          :
+          <AddCryptoCardButton onAddCircleClick={this.props.onAddCircleClick}/>
+      )
+  }
 
-    <Avatar
-     src="https://naqyr37xcg93tizq734pqsx1-wpengine.netdna-ssl.com/wp-content/uploads/2016/01/76-Intelligent-Richard-Branson-Quotes.jpg"
-     size={200}
-     style={AvatarStyle}
-      />
+  let loader = <Col md={12}><CircularProgress/></Col>
 
-  </Col>
+  return(
+    <div>
+      <header style={{height: '200px'}} className="App-header"/>
 
-  <Col   lg={5} md={4} sm={6} className='ProfitSheetCol'>
-    <div className='card card-1'>
-      <Row>
-        <Col md={8} lg={8} sm={8} xs={8}>
-          <h4 className="portfolioTitle">Portfolio</h4>
-        </Col>
 
-        <Col md={4} lg={4} sm={4} xs={4}>
-          <Chip style={{marginTop:'5px', marginBottom: '5px'}}>
-            {formatProfit(calculateOverallInvestment(profitData, 'currentValue'),Invested)}
-          </Chip>
+      <Row >
+        <Col sm={12} mdHidden  lgHidden style={{marginTop: '-195px'}} >
+        <Avatar
+         src="https://naqyr37xcg93tizq734pqsx1-wpengine.netdna-ssl.com/wp-content/uploads/2016/01/76-Intelligent-Richard-Branson-Quotes.jpg"
+         size={100}
+         style={AvatarStyle}
+          />
         </Col>
       </Row>
 
-        <AccountTable
-          column1="Coin"
-          column2="Amount"
-          column3="Current value"
-          mappedRows="profit"
-          tableData={profitData}/>
+    <Row style={{marginTop: '-95px'}}>
+      <Col lg={5} md={4} sm={6} className='InvestedSheetCol'>
+        <div className='card card-1'>
+          <h4>Invested</h4>
+          <AccountTable
+            column1="Investment"
+            column2="Coin"
+            column3="Amount"
+            mappedRows="investment"
+            tableData={investData}/>
+          <h5 className='text-center'>{calculateOverallInvestment(investData, 'investment')} $</h5>
 
-        <h5 className="text-center">
-          {Profit} $
-        </h5>
+        </div>
+      </Col>
+
+      <Col xsHidden smHidden lg={2} md={4} className='AvatarCol'>
+
+        <Avatar
+         src="https://naqyr37xcg93tizq734pqsx1-wpengine.netdna-ssl.com/wp-content/uploads/2016/01/76-Intelligent-Richard-Branson-Quotes.jpg"
+         size={200}
+         style={AvatarStyle}
+          />
+
+      </Col>
+
+      <Col   lg={5} md={4} sm={6} className='ProfitSheetCol'>
+        <div className='card card-1'>
+          <Row>
+            <Col md={8} lg={8} sm={8} xs={8}>
+              <h4 className="portfolioTitle">Portfolio</h4>
+            </Col>
+
+            <Col md={4} lg={4} sm={4} xs={4}>
+              <Chip style={{marginTop:'5px', marginBottom: '5px'}}>
+                {formatProfit(calculateOverallInvestment(profitData, 'currentValue'),Invested)}
+              </Chip>
+            </Col>
+          </Row>
+
+            <AccountTable
+              column1="Coin"
+              column2="Amount"
+              column3="Current value"
+              mappedRows="profit"
+              tableData={profitData}/>
+
+            <h5 className="text-center">
+              {Profit} $
+            </h5>
+
+        </div>
+      </Col>
+
+    </Row>
+
+    {/*
+    <Row>
+    <ExpandableCoinList/>
+    </Row>
+    */}
+
+
+    <Row>
+    <h3>Your Cards 💵 </h3>
+    </Row>
+
+    <Row>
+
+
+
+    <CryptoCard
+      tableData={cardData}
+      priceChange="1,000$"
+      frontTitle="COINBASE"
+      backGraph="Graph on the back of the card 📈"/>
+
+    <CryptoCard  tableData={cardData2} priceChange="734$" frontTitle="binance"/>
+    <CryptoCard  tableData={cardData2} priceChange="213$" frontTitle="tracking"/>
+
+    {cards.length===0 ? loader : cards }
+
+    {plusIcon}
+
+
+
+
+
+
+    </Row>
+
+    <Row>
+      <h1>Account: {auth.currentUser.email} </h1>
+      <p>The Account Page is accessible by every signed in user.</p>
+      < PasswordForgetPage />
+    </Row>
+
+
+
+
 
     </div>
-  </Col>
+  )
+    }
 
-</Row>
-
-{/*
-<Row>
-<ExpandableCoinList/>
-</Row>
-*/}
-
-<Row>
-<h3>Your Cards 💵 </h3>
-</Row>
-
-<Row>
-
-<CryptoCard
-  tableData={cardData}
-  priceChange="1,000$"
-  frontTitle="COINBASE"
-  backGraph="Graph on the back of the card 📈"/>
-
-<CryptoCard  tableData={cardData2} priceChange="734$" frontTitle="binance"/>
-<CryptoCard  tableData={cardData2} priceChange="213$" frontTitle="tracking"/>
-
-{props.showAddCard ?
-  <AddCryptoCard onCreateClick={props.onCreateClick}/>
-  :
-  <AddCryptoCardButton onAddCircleClick={props.onAddCircleClick}/>
 }
 
 
 
 
-</Row>
-
-<Row>
-  <h1>Account: {authUser.email} </h1>
-  <p>The Account Page is accessible by every signed in user.</p>
-  < PasswordForgetPage />
-</Row>
 
 
-
-
-</div>
-
-Person.contextTypes = {
-  authUser: PropTypes.object,
-};
 
 const AddCryptoCardButton = (props) =>
 <Col md={4}>

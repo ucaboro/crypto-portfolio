@@ -17,10 +17,10 @@ import PasswordForgetPage from './Containers/passwordForget.js'
 import SignInPage from './Containers/SignIn.js'
 import Register from './Containers/Register.js'
 
-import * as routes from './constants/routes';
+import * as routes from './constants/routes'
+
 
 const history = createBrowserHistory()
-
 
 
 class App extends Component {

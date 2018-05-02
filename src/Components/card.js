@@ -13,6 +13,12 @@ import {
   TableRow,
   TableRowColumn,
 } from 'material-ui/Table';
+import {db, auth} from '../firebase/firebase';
+import {deleteOneCard} from '../firebase/db';
+import Dialog from 'material-ui/Dialog';
+import RaisedButton from 'material-ui/RaisedButton';
+import AddCoin from '../Components/addCoin'
+
 
   const ChipStyles = {
     chip: {
@@ -28,10 +34,34 @@ export default class CryptoCard extends Component{
   constructor(props){
     super(props);
     this.state ={
-      flipped: ''
+      flipped: '',
+      toggledCardId: '',
+      openModal: false,
+      loaded: false,
+      openAddCoin: false
     }
     this.flipCardOnClick = this.flipCardOnClick.bind(this)
   }
+
+  onAddCoinClick = () =>{
+    this.setState({openAddCoin: true})
+    console.log(this.state.openAddCoin)
+  }
+
+  closeAddCoin = () =>{
+    this.setState({openAddCoin: false})
+  }
+
+    closeModal = () => {
+      this.setState({openModal: false});
+    };
+
+    openModal = () => {
+      this.setState({
+        openModal: true
+      })
+    }
+
 
   flipCardOnClick(){
     if(this.state.flipped===''){
@@ -45,17 +75,38 @@ export default class CryptoCard extends Component{
   }
   }
 
+
+
+  onDeleteCardClick = (e) =>{
+    //scaling up to get the id of the button in a card
+    const buttonText = e.target
+    const buttonContainer = buttonText.parentElement.parentElement
+    const cardId = buttonContainer.id
+    this.setState({toggledCardId: cardId})
+    this.openModal()
+  }
+
+  deleteCardFromDb = () =>{
+    if(this.state.toggledCardId.length!=0){
+    deleteOneCard(this.state.toggledCardId)
+   }
+  }
+
   render(){
+
+
     return(
 
-<Col md={4}>
-  <section className="FlipContainer">
-    <div id="card"  className={this.state.flipped}>
-      <CryptoCardFront tableData={this.props.tableData} priceChange={this.props.priceChange} frontTitle={this.props.frontTitle.toUpperCase()} OnFlipButtonClick={this.flipCardOnClick}/>
-      <CryptoCardBack priceChange={this.props.priceChange} backGraph={this.props.backGraph} frontTitle={this.props.frontTitle.toUpperCase()} OnFlipButtonClick={this.flipCardOnClick}/>
-    </div>
-  </section>
-</Col>
+        <Col md={4}>
+          <section className="FlipContainer">
+            <div id="card" key={this.props.cardKey} className={this.state.flipped}>
+              <CryptoCardFront tableData={this.props.tableData} priceChange={this.props.priceChange} frontTitle={this.props.frontTitle.toUpperCase()} OnFlipButtonClick={this.flipCardOnClick} onAddCoinClick={this.onAddCoinClick}/>
+              <CryptoCardBack cardKey={this.props.cardKey} priceChange={this.props.priceChange} backGraph={this.props.backGraph} frontTitle={this.props.frontTitle.toUpperCase()} OnFlipButtonClick={this.flipCardOnClick}  onDeleteCardClick={this.onDeleteCardClick}/>
+            </div>
+          </section>
+          <AddCoin openAddCoin={this.state.openAddCoin} handleClose={this.closeAddCoin}/>
+          <Modal openModal={this.state.openModal} handleClose={this.closeModal} handleDelete={this.deleteCardFromDb}/>
+        </Col>
     )
   }
 }
@@ -81,7 +132,7 @@ constructor(props){
          </Col>
 
          <Col md={6} sm={3} lg={6}>
-           <Chip className='center-block'>{this.props.priceChange}</Chip>
+           {this.props.priceChange!=undefined? <Chip className='center-block'>{this.props.priceChange}</Chip> : ''}
          </Col>
        </Row>
 
@@ -103,7 +154,7 @@ constructor(props){
          </Col>
 
          <Col md={3} xs={3}>
-           <FlatButton label="ADD NEW" primary={true} />
+           <FlatButton onClick={this.props.onAddCoinClick} label="ADD NEW" primary={true} />
          </Col>
        </Row>
      </CardActions>
@@ -135,7 +186,7 @@ class CryptoCardBack extends Component {
    </Col>
 
    <Col md={6} sm={3} lg={6}>
-     <Chip className='center-block'>{this.props.priceChange}</Chip>
+     {this.props.priceChange!=undefined? <Chip className='center-block'>{this.props.priceChange}</Chip> : ''}
    </Col>
   </Row>
 
@@ -151,12 +202,9 @@ class CryptoCardBack extends Component {
      <FlatButton label="BACK" onClick={this.props.OnFlipButtonClick} />
    </Col>
 
-   <Col md={3} xs={3}>
-     <FlatButton label="SELL" />
-   </Col>
 
-   <Col md={3} xs={3}>
-     <FlatButton label="ADD NEW" primary={true} />
+   <Col md={6} xs={6}>
+     <FlatButton onClick={this.props.onDeleteCardClick} label="DELETE CARD" primary={true} labelStyle={{color: '#B71C1C'}} id={this.props.cardKey} />
    </Col>
   </Row>
   </CardActions>
@@ -166,6 +214,7 @@ class CryptoCardBack extends Component {
    )
  }
 }
+
 
 
 const TableStyles = {
@@ -243,6 +292,41 @@ class TableExampleComplex extends Component {
           </TableBody>
 
         </Table>
+      </div>
+    );
+  }
+}
+
+
+ class Modal extends Component {
+
+  render() {
+    const actions = [
+      <FlatButton
+        label="Cancel"
+        primary={true}
+        onClick={this.props.handleClose}
+      />,
+      <FlatButton
+        label="Yes, Delete"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.props.handleDelete}
+      />,
+    ];
+
+    return (
+      <div>
+
+        <Dialog
+          title="Are you sure?"
+          actions={actions}
+          modal={false}
+          open={this.props.openModal}
+          onRequestClose={this.props.handleClose}
+        >
+          You will lose all data related to this card.
+        </Dialog>
       </div>
     );
   }
