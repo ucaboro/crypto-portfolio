@@ -14,7 +14,7 @@ import {
   TableRowColumn,
 } from 'material-ui/Table';
 import {db, auth} from '../firebase/firebase';
-import {deleteOneCard} from '../firebase/db';
+import {deleteOneCard, addCoinToCardId} from '../firebase/db';
 import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
 import AddCoin from '../Components/addCoin'
@@ -38,19 +38,65 @@ export default class CryptoCard extends Component{
       toggledCardId: '',
       openModal: false,
       loaded: false,
-      openAddCoin: false
+      openAddCoin: false,
+      //used for add coin modal dialog
+      coin:'',
+      amount:'',
+      exchange: '',
+      invested: ''
     }
     this.flipCardOnClick = this.flipCardOnClick.bind(this)
   }
 
-  onAddCoinClick = () =>{
-    this.setState({openAddCoin: true})
-    console.log(this.state.openAddCoin)
+  onAddCoinClick = (e) =>{
+    const buttonText = e.target
+    const buttonContainer = buttonText.parentElement.parentElement
+    const cardId = buttonContainer.id
+
+    this.setState({openAddCoin: true, toggledCardId: cardId})
+
+
   }
 
   closeAddCoin = () =>{
     this.setState({openAddCoin: false})
   }
+
+  //getting addCoin values
+
+  getCoin = (text) => {
+    this.setState({coin: text})
+  }
+
+
+  getAmount = (e) =>{
+    this.setState({amount: e.target.value})
+  }
+
+  getExchange = (text) =>{
+    this.setState({exchange: text})
+  }
+
+  getInvested = (e) =>{
+    this.setState({invested: e.target.value})
+      }
+
+  addCoinToCard = () =>{
+    let cardId = this.state.toggledCardId
+    let coin = this.state.coin
+    let amount = this.state.amount
+    let exchange = this.state.exchange
+    let invested = this.state.invested
+    //console.log(cardId +" " +coin +' ' + amount + ' ' + exchange + ' ' + invested)
+
+      addCoinToCardId(cardId, coin, amount, exchange, invested)
+      alert('👍 coolio')
+
+    //closing the modal
+    this.setState({openAddCoin:false})
+  }
+
+
 
     closeModal = () => {
       this.setState({openModal: false});
@@ -77,6 +123,8 @@ export default class CryptoCard extends Component{
 
 
 
+
+
   onDeleteCardClick = (e) =>{
     //scaling up to get the id of the button in a card
     const buttonText = e.target
@@ -99,12 +147,26 @@ export default class CryptoCard extends Component{
 
         <Col md={4}>
           <section className="FlipContainer">
-            <div id="card" key={this.props.cardKey} className={this.state.flipped}>
-              <CryptoCardFront tableData={this.props.tableData} priceChange={this.props.priceChange} frontTitle={this.props.frontTitle.toUpperCase()} OnFlipButtonClick={this.flipCardOnClick} onAddCoinClick={this.onAddCoinClick}/>
+            <div id="card" className={this.state.flipped} >
+              <CryptoCardFront
+                cardKey={this.props.cardKey}
+                tableData={this.props.tableData}
+                priceChange={this.props.priceChange}
+                frontTitle={this.props.frontTitle.toUpperCase()}
+                OnFlipButtonClick={this.flipCardOnClick}
+                onAddCoinClick={this.onAddCoinClick}
+
+
+                />
               <CryptoCardBack cardKey={this.props.cardKey} priceChange={this.props.priceChange} backGraph={this.props.backGraph} frontTitle={this.props.frontTitle.toUpperCase()} OnFlipButtonClick={this.flipCardOnClick}  onDeleteCardClick={this.onDeleteCardClick}/>
             </div>
           </section>
-          <AddCoin openAddCoin={this.state.openAddCoin} handleClose={this.closeAddCoin}/>
+          <AddCoin openAddCoin={this.state.openAddCoin} handleClose={this.closeAddCoin}
+             coin={this.getCoin}
+             amount={this.getAmount}
+             exchange={this.getExchange}
+             invested={this.getInvested}
+             addCoinToCard={this.addCoinToCard}/>
           <Modal openModal={this.state.openModal} handleClose={this.closeModal} handleDelete={this.deleteCardFromDb}/>
         </Col>
     )
@@ -154,7 +216,7 @@ constructor(props){
          </Col>
 
          <Col md={3} xs={3}>
-           <FlatButton onClick={this.props.onAddCoinClick} label="ADD NEW" primary={true} />
+           <FlatButton onClick={this.props.onAddCoinClick} id={this.props.cardKey} label="ADD NEW" primary={true} />
          </Col>
        </Row>
      </CardActions>

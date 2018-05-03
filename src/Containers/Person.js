@@ -14,7 +14,7 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 import AddSign from 'material-ui/svg-icons/content/add';
 import AddCryptoCard from '../Components/addCard';
 import {db, auth} from '../firebase/firebase';
-import {getUserCards, addCard, getAllCards, snapshotToArray} from '../firebase/db';
+import {getUserCards, addCard, getAllCards, snapshotToArray, getCoinsInCard} from '../firebase/db';
 import CircularProgress from 'material-ui/CircularProgress';
 
 
@@ -29,6 +29,7 @@ class Account extends Component{
     cardName: '',
     cards: '',
     cardLoaded: false,
+    coins: []
   }
   this.addNewCard = this.addNewCard.bind(this)
   this.createNewCard = this.createNewCard.bind(this)
@@ -38,17 +39,45 @@ class Account extends Component{
 
   componentWillMount(){
     const userCards = db.ref().child(auth.currentUser.uid);
-userCards.on('value', snap => {
+    let allCards =''
+          userCards.on('value', snap => {
       let cards =  snapshotToArray(snap);
       this.setState({
         cards
       })
+
+      let coins = []
+          for (let i=0; i<cards.length; i++){
+            let cardCoins = userCards.child(this.state.cards[i].key)
+           cardCoins.on('value', snap => {
+             coins.push(snap.val())
+           })
+          }
+          this.setState({
+            coins: snap.val()
+          })
+
+
+          let k  = this.state.coins
+          //way to iterate through the objects k.cardId.coinId.paramater
+          console.log(k['-LBXXO5rXVjuU9UuZLSq']['-LBad4UE0vk01VzTi6c7'].coin)
+
+
     });
+
+
+
+
+
   }
 
   componentDidMount(){
     this.setState({cardLoaded: true})
+
   }
+
+
+
 
   changeCardName(e){
     this.setState({
@@ -115,6 +144,7 @@ if(this.state.cardName.length!=0){
         cards = {this.state.cards}
         onKeyPress = {this.onEnter}
         cardLoaded = {this.state.cardLoaded}
+
         />
       </div>
     )
@@ -166,11 +196,15 @@ class Person extends Component{
 
 render(){
   let plusIcon = ''
-
+  let coins = ''
   let cards = []
   let list = this.props.cards;
   for (let value of list){
-    cards.push(<CryptoCard key={value.key} cardKey={value.key} frontTitle={value.name}/>)
+    cards.push(<CryptoCard
+      key={value.key}
+      cardKey={value.key}
+      frontTitle={value.name}
+      />)
   }
 
 //setting up logic for plusIcon to appear only after cards are loaded

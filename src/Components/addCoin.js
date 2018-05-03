@@ -8,6 +8,10 @@ import {Row, Col} from 'react-bootstrap';
 
 
 class AddCoin extends Component {
+  constructor(props){
+    super(props)
+  }
+
 
   render() {
     const actions = [
@@ -20,7 +24,7 @@ class AddCoin extends Component {
         label="Add to card"
         primary={true}
         keyboardFocused={true}
-        onClick={this.props.handleClose}
+        onClick={this.props.addCoinToCard}
       />,
     ];
 
@@ -36,6 +40,7 @@ class AddCoin extends Component {
         >
 
                   <AutoComplete
+                    onUpdateInput = {this.props.coin}
                     floatingLabelText="COIN"
                     hintText="Search a coin, e.g. type 'BTC'"
                     filter={AutoComplete.fuzzyFilter}
@@ -46,6 +51,7 @@ class AddCoin extends Component {
                   /><br/>
 
                   <TextField
+                    onChange = {this.props.amount}
                     floatingLabelText="AMOUNT"
                     hintText="Enter coin amount"
                     fullWidth={true}
@@ -53,6 +59,7 @@ class AddCoin extends Component {
                   /><br/>
 
                   <AutoComplete
+                    onUpdateInput = {this.props.exchange}
                     floatingLabelText="EXCHANGE"
                     hintText="Search for exchange"
                     filter={AutoComplete.fuzzyFilter}
@@ -64,6 +71,7 @@ class AddCoin extends Component {
                   /><br/>
 
                   <TextField
+                    onChange = {this.props.invested}
                     floatingLabelText="INVESTED"
                     hintText="Enter invested amount in USD"
                     fullWidth={true}

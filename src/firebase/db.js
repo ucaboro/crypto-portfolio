@@ -49,5 +49,19 @@ export const deleteOneCard = (id) => {
   cardToDelete.remove()
 }
 
+export const addCoinToCardId = (id, coin, amount, exchange, invested) => {
+  const dbRef=db.ref().child(auth.currentUser.uid).child(id);
+  dbRef.push({
+    coin: coin,
+    amount: amount,
+    exchange: exchange,
+    invested: invested
+  })
+}
+
+export const getCoinsInCard = (id) =>{
+  const dbRef = db.ref().child(auth.currentUser.uid).child(id)
+}
+
 
 // Other Entity APIs ...
