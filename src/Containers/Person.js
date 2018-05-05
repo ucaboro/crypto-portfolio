@@ -37,44 +37,19 @@ class Account extends Component{
   this.removeDimmer = this.removeDimmer.bind(this)
   }
 
-  componentWillMount(){
+  componentDidMount(){
     const userCards = db.ref().child(auth.currentUser.uid);
     let allCards =''
           userCards.on('value', snap => {
       let cards =  snapshotToArray(snap);
       this.setState({
-        cards
+        cards: cards,
+        cardLoaded:true
       })
-
-      let coins = []
-          for (let i=0; i<cards.length; i++){
-            let cardCoins = userCards.child(this.state.cards[i].key)
-           cardCoins.on('value', snap => {
-             coins.push(snap.val())
-           })
-          }
-          this.setState({
-            coins: snap.val()
-          })
-
-
-          let k  = this.state.coins
-          //way to iterate through the objects k.cardId.coinId.paramater
-          console.log(k['-LBXXO5rXVjuU9UuZLSq']['-LBad4UE0vk01VzTi6c7'].coin)
-
-
     });
-
-
-
-
-
   }
 
-  componentDidMount(){
-    this.setState({cardLoaded: true})
 
-  }
 
 
 
@@ -189,23 +164,49 @@ function calculateOverallInvestment(obj, prop){
 class Person extends Component{
   constructor(props, {authUser}){
   super(props, {authUser})
-
 }
 
 
-
 render(){
-  let plusIcon = ''
-  let coins = ''
-  let cards = []
-  let list = this.props.cards;
-  for (let value of list){
+let cardData = [];
+//generating cards and coins
+let plusIcon = ''
+let cards = []
+let list = this.props.cards;
+//🎁 cardKey = cardCoins.length-1
+//🎁 cardName = cardCoins.length-2
+//🎁 value.key = key of the card
+//🎁 value.name = name of the card
+
+
+for (let value of list){
+    //creating an object of cards+coins to iterate through
+    let cardCoins = Object.values(value)
+
+    //the last 2 objects are card name and a key, so exclude those through iteration (as only coins needed)
+    for (let n=0; n<cardCoins.length-2;n++){
+
+      //if the card name is the same push the coins to the card
+      if(cardCoins[cardCoins.length-1]===value.key){
+
+        console.log(cardCoins[n])
+        console.log("👆🏻 pushed to " + value.name)
+        cardData.push(cardCoins[n])
+      }
+    }
+    //creating a card component
     cards.push(<CryptoCard
       key={value.key}
       cardKey={value.key}
       frontTitle={value.name}
+      tableData={cardData}
       />)
-  }
+    //erasing coins from card for the next card pushed
+    cardData = []
+}
+
+
+
 
 //setting up logic for plusIcon to appear only after cards are loaded
   if(cards.length!=0){
@@ -303,14 +304,14 @@ render(){
 
 
 
-    <CryptoCard
+{/*    <CryptoCard
       tableData={cardData}
       priceChange="1,000$"
       frontTitle="COINBASE"
       backGraph="Graph on the back of the card 📈"/>
 
     <CryptoCard  tableData={cardData2} priceChange="734$" frontTitle="binance"/>
-    <CryptoCard  tableData={cardData2} priceChange="213$" frontTitle="tracking"/>
+    <CryptoCard  tableData={cardData2} priceChange="213$" frontTitle="tracking"/>*/}
 
     {cards.length===0 ? loader : cards }
 
@@ -410,33 +411,8 @@ const investData = [
   },
 ];
 
-const cardData = [
-  {
-    coin: 'BTC',
-    amount: '0.45',
-    value: '10000$'
-  },
-  {
-    coin: 'ETH',
-    amount: '12.45',
-    value: '8000$'
-  },
-  {
-    coin: 'EOS',
-    amount: '115',
-    value: '1150$'
-  },
-  {
-    coin: 'LTC',
-    amount: '3.12',
-    value: '900$'
-  },
-  {
-    coin: 'ADA',
-    amount: '98',
-    value: '867$'
-  },
-];
+
+
 
 const cardData2 = [
   {
@@ -451,6 +427,8 @@ const cardData2 = [
   },
 
 ];
+
+
 
 
 
