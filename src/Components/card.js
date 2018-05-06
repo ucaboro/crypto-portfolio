@@ -51,10 +51,10 @@ export default class CryptoCard extends Component{
   onAddCoinClick = (e) =>{
     const buttonText = e.target
     const buttonContainer = buttonText.parentElement.parentElement
-    const cardId = buttonContainer.id
+    const cardId = (buttonContainer.id.length>0 ? buttonContainer.id : buttonText.parentElement.id)
 
     this.setState({openAddCoin: true, toggledCardId: cardId})
-
+    console.log('cardId toggled: ' + cardId)
 
   }
 
@@ -94,6 +94,8 @@ export default class CryptoCard extends Component{
 
     //closing the modal
     this.setState({openAddCoin:false})
+
+    console.log('toggled card id on coin add: ' + cardId)
   }
 
 
@@ -129,14 +131,17 @@ export default class CryptoCard extends Component{
     //scaling up to get the id of the button in a card
     const buttonText = e.target
     const buttonContainer = buttonText.parentElement.parentElement
-    const cardId = buttonContainer.id
+    const cardId = (buttonContainer.id.length>0 ? buttonContainer.id : buttonText.parentElement.id) //fixing JS issue with not capturing parent element correctly all the time
     this.setState({toggledCardId: cardId})
     this.openModal()
+    console.log(buttonContainer)
+    console.log('deleting cardId: ' + cardId)
   }
 
   deleteCardFromDb = () =>{
     if(this.state.toggledCardId.length!=0){
     deleteOneCard(this.state.toggledCardId)
+    console.log('deleting from db cardId: ' + this.state.toggledCardId)
    }
   }
 

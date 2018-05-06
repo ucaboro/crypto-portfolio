@@ -29,7 +29,7 @@ class Account extends Component{
     cardName: '',
     cards: '',
     cardLoaded: false,
-    coins: []
+
   }
   this.addNewCard = this.addNewCard.bind(this)
   this.createNewCard = this.createNewCard.bind(this)
@@ -44,8 +44,9 @@ class Account extends Component{
       let cards =  snapshotToArray(snap);
       this.setState({
         cards: cards,
-        cardLoaded:true
+        cardLoaded:true,
       })
+
     });
   }
 
@@ -85,7 +86,7 @@ if(this.state.cardName.length!=0){
     dimmer: '0',
     dimmerHeight: '0%',
     showAddCard: false,
-    cardName: ''
+    cardName: '',
   })
 } else {
   alert('you need to create a name for the card')
@@ -98,7 +99,7 @@ if(this.state.cardName.length!=0){
   this.setState({
     dimmer: '0.7',
     dimmerHeight: '100%',
-    showAddCard: true
+    showAddCard: true,
   })
   }
 
@@ -107,7 +108,9 @@ if(this.state.cardName.length!=0){
 
 
   render(){
-
+    if (this.state.coins===''){
+      return (loader)
+    } else{
     return(
       <div>
       <div onClick = {this.removeDimmer} className= "pageDimmer" style={{opacity: this.state.dimmer, height: this.state.dimmerHeight}}/>
@@ -119,93 +122,91 @@ if(this.state.cardName.length!=0){
         cards = {this.state.cards}
         onKeyPress = {this.onEnter}
         cardLoaded = {this.state.cardLoaded}
-
         />
       </div>
     )
   }
 }
-
-const AvatarStyle = {
-  border: 0,
-  objectFit: 'cover',
-}
-
-let Profit = 0;
-let Invested = 0;
-
-function formatProfit(num1, num2){
-  let profit = num1 - num2;
-  if (profit>0){
-    return "+"+profit+ " $"
-  }else{
-    return "-"+profit+' $'
-  }
-
-}
-
-function calculateOverallInvestment(obj, prop){
-  let sum = 0;
-  for(let i=0; i<obj.length; i++){
-    sum=sum+obj[i][prop];
-  }
-
-  if(prop==="investment"){
-    Invested = sum;
-  } else {
-    Profit = sum;
-  }
-
-  return sum;
 }
 
 
+
+
+
+let cardData = [];
+let loader = <Col md={12}><CircularProgress/></Col>
 
 class Person extends Component{
   constructor(props, {authUser}){
   super(props, {authUser})
+
 }
 
 
+pushCoinsToCard = (value) =>{
+  //🎁 cardKey = cardCoins.length-1
+  //🎁 cardName = cardCoins.length-2
+  //🎁 value.key = key of the card
+  //🎁 value.name = name of the card
+
+  //creating an object of cards+coins to iterate through
+  let cardCoins = Object.values(value)
+
+  //the last 2 objects are card name and a key, so exclude those through iteration (as only coins needed)
+  for (let n=0; n<cardCoins.length-2;n++){
+
+    //if the card name is the same push the coins to the card
+    if(cardCoins[cardCoins.length-1]===value.key){
+
+      console.log(cardCoins[n])
+      cardData.push(cardCoins[n])
+    }
+  }
+  console.log("👆🏻 pushed to " + value.name)
+
+}
+
+createCardComponent = (cards, list) =>{
+
+  for (let value of list){
+
+      this.pushCoinsToCard(value)
+
+      //creating a card component
+      cards.push(<CryptoCard
+        key={value.key}
+        cardKey={value.key}
+        frontTitle={value.name}
+        tableData={cardData}
+        />)
+      //erasing coins from card for the next card pushed
+      cardData = []
+  }
+
+}
+
+calculateCoinsAmount = () =>{
+  let cards = Object.values(this.state.cards)
+  let countCoins = 0
+  for (let i=0; i<cards.length; i++){
+      countCoins=countCoins+Object.keys(cards[i]).length-2
+  }
+  return countCoins
+}
+
+
+
+
 render(){
-let cardData = [];
+
 //generating cards and coins
 let plusIcon = ''
 let cards = []
 let list = this.props.cards;
-//🎁 cardKey = cardCoins.length-1
-//🎁 cardName = cardCoins.length-2
-//🎁 value.key = key of the card
-//🎁 value.name = name of the card
 
 
-for (let value of list){
-    //creating an object of cards+coins to iterate through
-    let cardCoins = Object.values(value)
 
-    //the last 2 objects are card name and a key, so exclude those through iteration (as only coins needed)
-    for (let n=0; n<cardCoins.length-2;n++){
-
-      //if the card name is the same push the coins to the card
-      if(cardCoins[cardCoins.length-1]===value.key){
-
-        console.log(cardCoins[n])
-        console.log("👆🏻 pushed to " + value.name)
-        cardData.push(cardCoins[n])
-      }
-    }
-    //creating a card component
-    cards.push(<CryptoCard
-      key={value.key}
-      cardKey={value.key}
-      frontTitle={value.name}
-      tableData={cardData}
-      />)
-    //erasing coins from card for the next card pushed
-    cardData = []
-}
-
-
+  this.createCardComponent(cards, list)
 
 
 //setting up logic for plusIcon to appear only after cards are loaded
@@ -217,7 +218,8 @@ for (let value of list){
       )
   }
 
-  let loader = <Col md={12}><CircularProgress/></Col>
+
+
 
   return(
     <div>
@@ -429,7 +431,38 @@ const cardData2 = [
 ];
 
 
+const AvatarStyle = {
+  border: 0,
+  objectFit: 'cover',
+}
 
+let Profit = 0;
+let Invested = 0;
+
+function formatProfit(num1, num2){
+  let profit = num1 - num2;
+  if (profit>0){
+    return "+"+profit+ " $"
+  }else{
+    return "-"+profit+' $'
+  }
+
+}
+
+function calculateOverallInvestment(obj, prop){
+  let sum = 0;
+  for(let i=0; i<obj.length; i++){
+    sum=sum+obj[i][prop];
+  }
+
+  if(prop==="investment"){
+    Invested = sum;
+  } else {
+    Profit = sum;
+  }
+
+  return sum;
+}
 
 
 
