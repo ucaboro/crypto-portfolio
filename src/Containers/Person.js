@@ -16,6 +16,7 @@ import AddCryptoCard from '../Components/addCard';
 import {db, auth} from '../firebase/firebase';
 import {getUserCards, addCard, getAllCards, snapshotToArray, getCoinsInCard} from '../firebase/db';
 import CircularProgress from 'material-ui/CircularProgress';
+import request from 'superagent'
 
 
 class Account extends Component{
@@ -179,7 +180,7 @@ createCardComponent = (cards, list) =>{
         frontTitle={value.name}
         tableData={cardData}
         />)
-      //erasing coins from card for the next card pushed
+      //erasing coins from card for the next card push
       cardData = []
   }
 
@@ -198,6 +199,7 @@ calculateCoinsAmount = () =>{
 
 
 render(){
+
 
 //generating cards and coins
 let plusIcon = ''

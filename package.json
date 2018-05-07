@@ -22,7 +22,7 @@
     "react-scripts": "1.0.17",
     "react-simple-infinite-scroll": "0.0.1",
     "reactfire": "^1.0.0",
-    "superagent": "^3.8.2"
+    "superagent": "^3.8.3"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -147,6 +147,12 @@ export default class CryptoCard extends Component{
 
   render(){
 
+    let addCoin = (<AddCoin openAddCoin={this.state.openAddCoin} handleClose={this.closeAddCoin}
+       coin={this.getCoin}
+       amount={this.getAmount}
+       exchange={this.getExchange}
+       invested={this.getInvested}
+       addCoinToCard={this.addCoinToCard}/>)
 
     return(
 
@@ -166,12 +172,7 @@ export default class CryptoCard extends Component{
               <CryptoCardBack cardKey={this.props.cardKey} priceChange={this.props.priceChange} backGraph={this.props.backGraph} frontTitle={this.props.frontTitle.toUpperCase()} OnFlipButtonClick={this.flipCardOnClick}  onDeleteCardClick={this.onDeleteCardClick}/>
             </div>
           </section>
-          <AddCoin openAddCoin={this.state.openAddCoin} handleClose={this.closeAddCoin}
-             coin={this.getCoin}
-             amount={this.getAmount}
-             exchange={this.getExchange}
-             invested={this.getInvested}
-             addCoinToCard={this.addCoinToCard}/>
+          {this.state.openAddCoin ? addCoin : ''}
           <Modal openModal={this.state.openModal} handleClose={this.closeModal} handleDelete={this.deleteCardFromDb}/>
         </Col>
     )
@@ -325,6 +326,7 @@ class TableExampleComplex extends Component {
           <TableRowColumn>{row.coin}</TableRowColumn>
           <TableRowColumn>{row.amount}</TableRowColumn>
           <TableRowColumn>{row.value}</TableRowColumn>
+          <TableRowColumn className="hiddenTable">{row.exchange}</TableRowColumn>
         </TableRow>
       ))
     }
@@ -347,6 +349,7 @@ class TableExampleComplex extends Component {
               <TableHeaderColumn tooltip="Cryptocurrency">Coin</TableHeaderColumn>
               <TableHeaderColumn tooltip="Your amount">Amount</TableHeaderColumn>
               <TableHeaderColumn tooltip="Your current price">Current Value</TableHeaderColumn>
+              <TableHeaderColumn className="hiddenTable">Exchange to hide</TableHeaderColumn>
             </TableRow>
           </TableHeader>
           <TableBody
