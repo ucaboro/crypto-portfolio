@@ -63,5 +63,13 @@ export const getCoinsInCard = (id) =>{
   const dbRef = db.ref().child(auth.currentUser.uid).child(id)
 }
 
+export const loadDbWithCoinNames = (arr) =>{
+  db.ref().child('coins').push(arr)
+}
+
+export const loadCoinNames = () =>{
+db.ref().child('coins').child('-LBwn6Kt81C3g65yR7ns')
+}
+
 
 // Other Entity APIs ...
