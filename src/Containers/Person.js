@@ -30,7 +30,7 @@ class Account extends Component{
     cardName: '',
     cards: '',
     cardLoaded: false,
-
+    price: []
   }
   this.addNewCard = this.addNewCard.bind(this)
   this.createNewCard = this.createNewCard.bind(this)
@@ -38,21 +38,39 @@ class Account extends Component{
   this.removeDimmer = this.removeDimmer.bind(this)
   }
 
-  componentDidMount(){
-    const userCards = db.ref().child(auth.currentUser.uid);
-    let allCards =''
+
+
+
+
+async componentDidMount(){
+//have to have this for instant update with the db
+  const userCards = db.ref().child(auth.currentUser.uid);
           userCards.on('value', snap => {
-      let cards =  snapshotToArray(snap);
-      this.setState({
-        cards: cards,
-        cardLoaded:true,
-      })
+             let cards = snapshotToArray(snap);
+             this.setState({cards})
+   });
 
-    });
+  let cards = await this.getCardsFromDb()
+  let price =  await this.getPrice(cards, 'USD')
+  if (price.length!=0 && cards.length!=0){
+   this.setState({price, cardLoaded:true})
+ }
+ }
+
+
+
+
+   getCardsFromDb (){
+
+    return new Promise(function(resolve,reject){
+      const userCards = db.ref().child(auth.currentUser.uid);
+              userCards.on('value', snap => {
+                 let cards = snapshotToArray(snap);
+
+            resolve(cards)
+       });
+    })
   }
-
-
-
 
 
 
@@ -77,6 +95,12 @@ removeDimmer(){
   })
 }
 
+
+
+getCoinPriceFromSpecificExchange = (coins,e) =>{
+
+}
+
 createNewCard(){
 
 //condition to ensure the card name is entered
@@ -92,11 +116,10 @@ if(this.state.cardName.length!=0){
 } else {
   alert('you need to create a name for the card')
 }
-
-
 }
 
  addNewCard(){
+
   this.setState({
     dimmer: '0.7',
     dimmerHeight: '100%',
@@ -104,14 +127,163 @@ if(this.state.cardName.length!=0){
   })
   }
 
+  //APIs
+    async getPrice(cards, currency) {
+   try {
+
+       let coins =  await this.getAllCoinsInString(cards)
+
+       let price =  await this.getCoinPriceFromApi(coins, currency)
+
+
+       return price
+
+
+
+   } catch (e) {
+     console.error(e);
+   }
+ }
+
+ async getCoinPriceFromApi   (coins, currency)   {
+   let price = []
+   try {
+
+ await request
+ .get(`https://min-api.cryptocompare.com/data/pricemulti?fsyms=${coins}&tsyms=${currency}`)
+ .type('json')
+ .then( function(res){
+   console.log('price retirieving..')
+   price.push( res.body)
+   //response = Object.keys(res.body)
+ })
+
+ } catch(err){
+   console.error(err.message)
+ }
+return price[0]
+}
+
+
+
+  getCoinAbbr = (coinFullName) =>{
+    //conditionals for parcing just the coin code in brackets
+    let regExp = /\(([^)]+)\)/
+    let matches = regExp.exec(coinFullName)
+
+    return matches[1]
+  }
+
+
+  getAllCoinsInString = (cards) => {
+
+  let cardsObject = Object.values(cards)
+  let coinsInArray = []
+  let parsedCoin = ''
+
+  //conditionals for parcing just the coin code in brackets
+  let regExp = /\(([^)]+)\)/
+
+
+  //practicing alternative for loop
+  for(let value of cardsObject){
+
+    for (let coinValues of Object.values(value)){
+      //excluding undefined and blank
+      if(coinValues.coin!=''&&coinValues.coin!=undefined){
+         parsedCoin = regExp.exec(coinValues.coin)
+
+         coinsInArray.push(parsedCoin[1])
+         //coins.push(parsedCoin[1])
+
+
+    }
+      //need to pard for everything that is in brackets if brackets exist
+    }
+  }
+  let unique = [ ...new Set(coinsInArray) ]
+  //console.log(unique)
+  return unique.toString()
+
+
+
+}
+
+
+
+
+
+ pushCoinsToCard = (value, price) =>{
+  //🎁 cardKey = cardCoins.length-1
+  //🎁 cardName = cardCoins.length-2
+  //🎁 value.key = key of the card
+  //🎁 value.name = name of the card
+//console.log(Object.keys(price))
+
+  //creating an object of cards+coins to iterate through
+  let cardCoins = Object.values(value)
+
+  //retrieving the price from the API
+  //let coins = this.getAllCoinsInString()
+  //let price = this.getCoinPriceFromApi(coins, 'USD')
+
+  //the last 2 objects are card name and a key, so exclude those through iteration (as only coins needed)
+  for (let n=0; n<cardCoins.length-2;n++){
+
+    //if the card name is the same push the coins to the card
+    if(cardCoins[cardCoins.length-1]===value.key){
+
+      //console.log(cardCoins[n])
+      cardData.push(cardCoins[n])
+        if(Object.keys(price).includes(this.getCoinAbbr(cardCoins[n].coin))){
+          cardData[n]['value'] = Object.values(price[this.getCoinAbbr(cardCoins[n].coin)]).toString()
+          console.log('price attached to '
+          + this.getCoinAbbr(cardCoins[n].coin)
+          +' '+Object.values(price[this.getCoinAbbr(cardCoins[n].coin)]))
+        }
+
+
+    }
+  }
+  //console.log("👆🏻 pushed to " + value.name)
+
+}
+
+
+
+
+
+    createCardComponent = () => {
+    let list =  this.state.cards
+    let price =  this.state.price
+    let cards = []
+    //console.log(list.length)
+  for (let value of list){
+      this.pushCoinsToCard(value, price)
+
+      //creating a card component
+      cards.push(<CryptoCard
+        key={value.key}
+        cardKey={value.key}
+        frontTitle={value.name}
+        tableData={cardData}
+        />)
+
+
+      //erasing coins from card for the next card push
+      cardData = []
+  }
+return cards
+}
+
 
 
 
 
   render(){
-    if (this.state.coins===''){
-      return (loader)
-    } else{
+
+if(this.state.price.length!=0){
+
     return(
       <div>
       <div onClick = {this.removeDimmer} className= "pageDimmer" style={{opacity: this.state.dimmer, height: this.state.dimmerHeight}}/>
@@ -123,10 +295,11 @@ if(this.state.cardName.length!=0){
         cards = {this.state.cards}
         onKeyPress = {this.onEnter}
         cardLoaded = {this.state.cardLoaded}
+        createCardComponent ={this.createCardComponent}
         />
       </div>
-    )
-  }
+    )}else{return loader}
+
 }
 }
 
@@ -136,6 +309,9 @@ if(this.state.cardName.length!=0){
 
 let cardData = [];
 let loader = <Col md={12}><CircularProgress/></Col>
+let coins = []
+//let cards =[]
+
 
 class Person extends Component{
   constructor(props, {authUser}){
@@ -144,47 +320,11 @@ class Person extends Component{
 }
 
 
-pushCoinsToCard = (value) =>{
-  //🎁 cardKey = cardCoins.length-1
-  //🎁 cardName = cardCoins.length-2
-  //🎁 value.key = key of the card
-  //🎁 value.name = name of the card
 
-  //creating an object of cards+coins to iterate through
-  let cardCoins = Object.values(value)
 
-  //the last 2 objects are card name and a key, so exclude those through iteration (as only coins needed)
-  for (let n=0; n<cardCoins.length-2;n++){
 
-    //if the card name is the same push the coins to the card
-    if(cardCoins[cardCoins.length-1]===value.key){
 
-      console.log(cardCoins[n])
-      cardData.push(cardCoins[n])
-    }
-  }
-  console.log("👆🏻 pushed to " + value.name)
 
-}
-
-createCardComponent = (cards, list) =>{
-
-  for (let value of list){
-
-      this.pushCoinsToCard(value)
-
-      //creating a card component
-      cards.push(<CryptoCard
-        key={value.key}
-        cardKey={value.key}
-        frontTitle={value.name}
-        tableData={cardData}
-        />)
-      //erasing coins from card for the next card push
-      cardData = []
-  }
-
-}
 
 calculateCoinsAmount = () =>{
   let cards = Object.values(this.state.cards)
@@ -198,21 +338,31 @@ calculateCoinsAmount = () =>{
 
 
 
+
 render(){
 
 
+
+
+console.info('RENDERED')
 //generating cards and coins
 let plusIcon = ''
-let cards = []
 let list = this.props.cards;
+console.info(list)
+
+
+let cards = this.props.createCardComponent()
+
+console.log(cards)
 
 
 
-  this.createCardComponent(cards, list)
+
+
 
 
 //setting up logic for plusIcon to appear only after cards are loaded
-  if(cards.length!=0){
+  if(this.props.cardLoaded){
     plusIcon = (    this.props.showAddCard ?
           <AddCryptoCard changeCardName = {this.props.changeCardName} onKeyPress={this.props.onKeyPress} onCreateClick={this.props.onCreateClick}/>
           :
@@ -317,7 +467,9 @@ let list = this.props.cards;
     <CryptoCard  tableData={cardData2} priceChange="734$" frontTitle="binance"/>
     <CryptoCard  tableData={cardData2} priceChange="213$" frontTitle="tracking"/>*/}
 
-    {cards.length===0 ? loader : cards }
+    {/*cards.props.map((value) => <p>value</p>)*/}
+
+    {this.props.cardLoaded ? cards : loader}
 
     {plusIcon}
 

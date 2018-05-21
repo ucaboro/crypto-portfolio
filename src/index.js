@@ -8,7 +8,7 @@ import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import ExpandableCoinList from './Components/expandableCoinList'
-
+import About from './Containers/About'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 
