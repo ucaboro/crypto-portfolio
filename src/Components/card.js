@@ -14,10 +14,13 @@ import {
   TableRowColumn,
 } from 'material-ui/Table';
 import {db, auth} from '../firebase/firebase';
-import {deleteOneCard, addCoinToCardId} from '../firebase/db';
+import {deleteOneCard, addCoinToCardId, getCoinsInCard, updateCoinsInCardId} from '../firebase/db';
 import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
 import AddCoin from '../Components/addCoin'
+import Snackbar from 'material-ui/Snackbar';
+
+
 
 
   const ChipStyles = {
@@ -43,7 +46,10 @@ export default class CryptoCard extends Component{
       coin:'',
       amount:'',
       exchange: '',
-      invested: ''
+      invested: '',
+
+      snackbarOpen: false,
+      snackbarMessage: '',
     }
     this.flipCardOnClick = this.flipCardOnClick.bind(this)
   }
@@ -55,6 +61,9 @@ export default class CryptoCard extends Component{
 
     this.setState({openAddCoin: true, toggledCardId: cardId})
     console.log('cardId toggled: ' + cardId)
+
+    //need to retrieve all coins from that card for comparison
+
 
   }
 
@@ -81,6 +90,13 @@ export default class CryptoCard extends Component{
     this.setState({invested: e.target.value})
       }
 
+  handleRequestClose = () => {
+        this.setState({
+          snackbarOpen: false,
+        });
+
+      };
+
   addCoinToCard = () =>{
     let cardId = this.state.toggledCardId
     let coin = this.state.coin
@@ -88,9 +104,60 @@ export default class CryptoCard extends Component{
     let exchange = this.state.exchange
     let invested = this.state.invested
     //console.log(cardId +" " +coin +' ' + amount + ' ' + exchange + ' ' + invested)
+    //need to check card key and compare whether the newly added card already expandableList
 
-      addCoinToCardId(cardId, coin, amount, exchange, invested)
-      alert('👍 coolio')
+      /*
+        1 get card's key
+        2 .includes(newCoinAbr)
+        3 if exist  - function to add up amount and invested
+        4 if doesn't exist - add addCoinToCardId
+      */
+      let allCardCoins = []
+        const coinsInCard = getCoinsInCard(cardId)
+                coinsInCard.on('value', snap => {
+                   let coins = snap.val();
+                   console.log(coins)
+                   allCardCoins = coins
+         });
+
+      //let coinsInCard = getCoinsInCard(cardId)
+      let coinsArr = []
+      for (let i=0; i<Object.values(allCardCoins).length-1;i++ ){
+        coinsArr.push(Object.values(allCardCoins)[i].coin)
+
+      }
+
+
+
+      if (coinsArr.includes(coin)){
+        let newAmount = ''
+        let newInvested = ''
+        let coinId = ''
+        //update invested and amount to merge coins
+        for (let i=0; i<Object.values(allCardCoins).length-1;i++ ){
+          if(Object.values(allCardCoins)[i].coin === coin){
+          newAmount = Number(Object.values(allCardCoins)[i].amount) + Number(amount)
+          newInvested = Number(Object.values(allCardCoins)[i].invested) + Number(invested)
+          coinId = Object.keys(allCardCoins)[i]
+        }
+        }
+
+        updateCoinsInCardId(cardId, coinId, newAmount, exchange, newInvested)
+        //alert(`👍 ${coin} has been updated in your card`)
+        this.setState({
+          snackbarOpen: true,
+          snackbarMessage: `👍 ${coin} has been updated in your card`
+        })
+      } else{
+        addCoinToCardId(cardId, coin, amount, exchange, invested)
+        //alert(`👍 ${coin} has been added to your card`)
+        this.setState({
+          snackbarOpen: true,
+          snackbarMessage: `👍 ${coin} has been added to your card`
+        })
+      }
+
+
 
     //closing the modal
     this.setState({openAddCoin:false})
@@ -156,6 +223,7 @@ export default class CryptoCard extends Component{
 
     return(
 
+
         <Col md={4}>
           <section className="FlipContainer">
             <div id="card" className={this.state.flipped} >
@@ -174,7 +242,15 @@ export default class CryptoCard extends Component{
           </section>
           {this.state.openAddCoin ? addCoin : ''}
           <Modal openModal={this.state.openModal} handleClose={this.closeModal} handleDelete={this.deleteCardFromDb}/>
+
+            <Snackbar
+      open={this.state.snackbarOpen}
+      message={this.state.snackbarMessage}
+      autoHideDuration={3000}
+      onRequestClose={this.handleRequestClose}
+    />
         </Col>
+
     )
   }
 }
@@ -200,7 +276,7 @@ constructor(props){
          </Col>
 
          <Col md={6} sm={3} lg={6}>
-           {this.props.priceChange!=undefined? <Chip className='center-block'>{this.props.priceChange}</Chip> : ''}
+           {this.props.priceChange!=undefined&&this.props.priceChange!=0? <Chip className='center-block'>{this.props.priceChange}</Chip> : ''}
          </Col>
        </Row>
 
@@ -254,7 +330,7 @@ class CryptoCardBack extends Component {
    </Col>
 
    <Col md={6} sm={3} lg={6}>
-     {this.props.priceChange!=undefined? <Chip className='center-block'>{this.props.priceChange}</Chip> : ''}
+     {this.props.priceChange!=undefined&&this.props.priceChange!=0? <Chip className='center-block'>{this.props.priceChange}</Chip> : ''}
    </Col>
   </Row>
 
@@ -322,12 +398,17 @@ class TableExampleComplex extends Component {
     let data = ''
     if(this.props.tableData != undefined){
       data= this.props.tableData.map( (row, index) => (
-        <TableRow key={index}>
+        <TableRow key={index} className="cardRow">
           <TableRowColumn>{row.coin}</TableRowColumn>
           <TableRowColumn>{row.amount}</TableRowColumn>
-          <TableRowColumn>{row.value}</TableRowColumn>
+          //animate value pulse on RENDER
+
+              <TableRowColumn   id="price" className="pulse">{row.value} <a id='deleteCardRow' className="deleteCardRow" style={{ marginLeft: '60%'}}>delete</a></TableRowColumn>
+
           <TableRowColumn className="hiddenTable">{row.exchange}</TableRowColumn>
+
         </TableRow>
+
       ))
     }
 
@@ -349,7 +430,7 @@ class TableExampleComplex extends Component {
               <TableHeaderColumn tooltip="Cryptocurrency">Coin</TableHeaderColumn>
               <TableHeaderColumn tooltip="Your amount">Amount</TableHeaderColumn>
               <TableHeaderColumn tooltip="Your current price">Current Value</TableHeaderColumn>
-              <TableHeaderColumn className="hiddenTable">Exchange to hide</TableHeaderColumn>
+              <TableHeaderColumn className="hiddenTable"></TableHeaderColumn>
             </TableRow>
           </TableHeader>
           <TableBody

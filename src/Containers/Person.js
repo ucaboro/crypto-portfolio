@@ -30,7 +30,8 @@ class Account extends Component{
     cardName: '',
     cards: '',
     cardLoaded: false,
-    price: []
+    price: [],
+    initialCoinAmount: '',
   }
   this.addNewCard = this.addNewCard.bind(this)
   this.createNewCard = this.createNewCard.bind(this)
@@ -43,6 +44,8 @@ class Account extends Component{
 
 
 async componentDidMount(){
+
+
 //have to have this for instant update with the db
   const userCards = db.ref().child(auth.currentUser.uid);
           userCards.on('value', snap => {
@@ -50,12 +53,16 @@ async componentDidMount(){
              this.setState({cards})
    });
 
+
+/*
   let cards = await this.getCardsFromDb()
   let price =  await this.getPrice(cards, 'USD')
   if (price.length!=0 && cards.length!=0){
-   this.setState({price, cardLoaded:true})
+   //this.setState({price, cardLoaded:true, initialCoinAmount: this.calculateCoinsAmount()})
  }
+*/
  }
+
 
 
 
@@ -112,6 +119,7 @@ if(this.state.cardName.length!=0){
     dimmerHeight: '0%',
     showAddCard: false,
     cardName: '',
+
   })
 } else {
   alert('you need to create a name for the card')
@@ -236,7 +244,11 @@ return price[0]
       //console.log(cardCoins[n])
       cardData.push(cardCoins[n])
         if(Object.keys(price).includes(this.getCoinAbbr(cardCoins[n].coin))){
-          cardData[n]['value'] = Object.values(price[this.getCoinAbbr(cardCoins[n].coin)]).toString()
+
+          let val = Object.values(price[this.getCoinAbbr(cardCoins[n].coin)]).toString()*cardCoins[n].amount
+
+          cardData[n]['value'] = val.toFixed(2)
+
           console.log('price attached to '
           + this.getCoinAbbr(cardCoins[n].coin)
           +' '+Object.values(price[this.getCoinAbbr(cardCoins[n].coin)]))
@@ -251,15 +263,36 @@ return price[0]
 
 
 
+calculateCardPriceChange(value){
+  let investedSum = 0
+  let currentValueSum = 0
+
+        for(let n=0; n<Object.values(value).length-2;n++){
+        investedSum = investedSum+Number(Object.values(value)[n].invested)
+        currentValueSum = currentValueSum+Number(Object.values(value)[n].value)
+      }
+
+        let priceChange = currentValueSum-investedSum
+        return priceChange
+
+  }
 
 
     createCardComponent = () => {
+    //let profit = this.calculateCardPriceChange()
     let list =  this.state.cards
     let price =  this.state.price
     let cards = []
-    //console.log(list.length)
+
+
+
+
+    //this.calculateCardPriceChange()
   for (let value of list){
       this.pushCoinsToCard(value, price)
+
+      let priceChange=this.calculateCardPriceChange(value)
+
 
       //creating a card component
       cards.push(<CryptoCard
@@ -267,22 +300,58 @@ return price[0]
         cardKey={value.key}
         frontTitle={value.name}
         tableData={cardData}
+        priceChange={priceChange.toFixed(2)}
         />)
 
 
       //erasing coins from card for the next card push
       cardData = []
+      priceChange = 0
+
   }
 return cards
 }
 
 
+calculateCoinsAmount = () =>{
+  let cards = Object.values(this.state.cards)
+  let countCoins = 0
+  for (let i=0; i<cards.length; i++){
+      countCoins=countCoins+Object.keys(cards[i]).length-2
+  }
+  return countCoins
+}
 
+
+async rerenderComponentDidMount(){
+  /*POTENTIALLY IMPOROVE BY ACCESSING ONLY 1 SPECIFIC COIN PRICE AND RE-RENDER*/
+  //in case a new coin has been added, need to access API again for price retrieval
+  let n = this.calculateCoinsAmount()
+    if (this.state.initialCoinAmount!=this.calculateCoinsAmount()){
+        console.log(this.state.initialCoinAmount + " - " +n)
+
+  //rerendering
+  let cards = await this.getCardsFromDb()
+  let price =  await this.getPrice(this.state.cards, 'USD')
+  if (price.length!=0 && cards.length!=0){
+   this.setState({price, cardLoaded:true, initialCoinAmount: this.calculateCoinsAmount()})
+  }
+}
+}
+
+componentDidUpdate(){
+
+  this.rerenderComponentDidMount()
+
+}
 
 
   render(){
+    console.log(this.createCardComponent())
+
 
 if(this.state.price.length!=0){
+
 
     return(
       <div>
@@ -296,6 +365,8 @@ if(this.state.price.length!=0){
         onKeyPress = {this.onEnter}
         cardLoaded = {this.state.cardLoaded}
         createCardComponent ={this.createCardComponent}
+        calculateCoinsAmount = {this.calculateCoinsAmount}
+        initialCoinAmount ={this.state.initialCoinAmount}
         />
       </div>
     )}else{return loader}
@@ -317,6 +388,8 @@ class Person extends Component{
   constructor(props, {authUser}){
   super(props, {authUser})
 
+
+
 }
 
 
@@ -326,14 +399,7 @@ class Person extends Component{
 
 
 
-calculateCoinsAmount = () =>{
-  let cards = Object.values(this.state.cards)
-  let countCoins = 0
-  for (let i=0; i<cards.length; i++){
-      countCoins=countCoins+Object.keys(cards[i]).length-2
-  }
-  return countCoins
-}
+
 
 
 
@@ -343,13 +409,9 @@ render(){
 
 
 
-
 console.info('RENDERED')
 //generating cards and coins
 let plusIcon = ''
-let list = this.props.cards;
-console.info(list)
-
 
 let cards = this.props.createCardComponent()
 

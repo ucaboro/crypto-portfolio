@@ -59,8 +59,14 @@ export const addCoinToCardId = (id, coin, amount, exchange, invested) => {
   })
 }
 
+export const updateCoinsInCardId = (cardId, coinId, amount, exchange, invested) =>{
+  const dbRef=db.ref().child(auth.currentUser.uid).child(cardId).child(coinId);
+  dbRef.update({ amount: amount, invested:invested, exchange:exchange });
+}
+
 export const getCoinsInCard = (id) =>{
   const dbRef = db.ref().child(auth.currentUser.uid).child(id)
+  return dbRef
 }
 
 export const loadDbWithCoinNames = (arr) =>{
@@ -70,6 +76,8 @@ export const loadDbWithCoinNames = (arr) =>{
 export const loadCoinNames = () =>{
 db.ref().child('coins').child('-LBwn6Kt81C3g65yR7ns')
 }
+
+
 
 
 // Other Entity APIs ...
