@@ -24,7 +24,8 @@ export default class AccountTable extends Component{
       tooltip2={this.props.tooltip2}
       tooltip3={this.props.tooltip3}
       mappedRows={this.props.mappedRows}
-      tableData={this.props.tableData}/>
+      tableData={this.props.tableData}
+      height={this.props.height}/>
     )
   }
 }
@@ -44,7 +45,7 @@ class TableExampleComplex extends Component {
     enableSelectAll: false,
     deselectOnClickaway: false,
     showCheckboxes: false,
-    height: '150px',
+
   };
 
 
@@ -75,7 +76,7 @@ class TableExampleComplex extends Component {
     return (
       <div>
         <Table
-          height={this.state.height}
+          height={this.props.height}
           fixedHeader={this.state.fixedHeader}
           fixedFooter={this.state.fixedFooter}
           selectable={this.state.selectable}

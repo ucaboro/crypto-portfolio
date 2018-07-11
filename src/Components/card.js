@@ -23,6 +23,8 @@ import Snackbar from 'material-ui/Snackbar';
 
 
 
+
+
   const ChipStyles = {
     chip: {
       margin: '15px 0 0 0',
@@ -212,6 +214,7 @@ export default class CryptoCard extends Component{
    }
   }
 
+
   render(){
 
     let addCoin = (<AddCoin openAddCoin={this.state.openAddCoin} handleClose={this.closeAddCoin}
@@ -224,8 +227,12 @@ export default class CryptoCard extends Component{
     return(
 
 
-        <Col md={4}>
-          <section className="FlipContainer">
+
+
+
+
+        <Col md={4} >
+          <section className="FlipContainer drag">
             <div id="card" className={this.state.flipped} >
               <CryptoCardFront
                 cardKey={this.props.cardKey}
@@ -250,6 +257,7 @@ export default class CryptoCard extends Component{
       onRequestClose={this.handleRequestClose}
     />
         </Col>
+
 
     )
   }

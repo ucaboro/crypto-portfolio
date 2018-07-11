@@ -17,6 +17,13 @@ import {db, auth} from '../firebase/firebase';
 import {getUserCards, addCard, getAllCards, snapshotToArray, getCoinsInCard} from '../firebase/db';
 import CircularProgress from 'material-ui/CircularProgress';
 import request from 'superagent'
+import IconButton from 'material-ui/IconButton';
+import ExpandIcon from 'material-ui/svg-icons/navigation/fullscreen';
+import posed from 'react-pose'
+import styled from 'styled-components';
+import { tween } from "popmotion";
+
+import Dragula from 'react-dragula';
 
 
 class Account extends Component{
@@ -44,23 +51,12 @@ class Account extends Component{
 
 
 async componentDidMount(){
-
-
 //have to have this for instant update with the db
   const userCards = db.ref().child(auth.currentUser.uid);
           userCards.on('value', snap => {
              let cards = snapshotToArray(snap);
              this.setState({cards})
    });
-
-
-/*
-  let cards = await this.getCardsFromDb()
-  let price =  await this.getPrice(cards, 'USD')
-  if (price.length!=0 && cards.length!=0){
-   //this.setState({price, cardLoaded:true, initialCoinAmount: this.calculateCoinsAmount()})
- }
-*/
  }
 
 
@@ -313,6 +309,7 @@ return cards
 }
 
 
+
 calculateCoinsAmount = () =>{
   let cards = Object.values(this.state.cards)
   let countCoins = 0
@@ -338,6 +335,7 @@ async rerenderComponentDidMount(){
   }
 }
 }
+
 
 componentDidUpdate(){
 
@@ -367,6 +365,8 @@ if(this.state.price.length!=0){
         createCardComponent ={this.createCardComponent}
         calculateCoinsAmount = {this.calculateCoinsAmount}
         initialCoinAmount ={this.state.initialCoinAmount}
+        getCoinAbbr = {this.getCoinAbbr}
+        price = {this.state.price}
         />
       </div>
     )}else{return loader}
@@ -384,30 +384,85 @@ let coins = []
 //let cards =[]
 
 
+
+
+const Square = posed.div({
+  fullscreen: {
+    width: "95vw",
+    height: "100%",
+  },
+  idle: {
+    width: "100%",
+    height: "100%",
+  }
+});
+
+
 class Person extends Component{
   constructor(props, {authUser}){
   super(props, {authUser})
-
-
-
+  this.state = { fullscreen: false, tableHeightFull: false };
 }
 
 
 
+//add date
+getInvestData = () =>{
+  investData = []
+  let cardsObject = Object.values(this.props.cards)
+
+  for(let value of cardsObject){
+
+    for (let i=0; i<Object.values(value).length-2;i++){
+
+      investData.push({
+         investment: Number(Object.values(value)[i].invested),
+         coin: this.props.getCoinAbbr(Object.values(value)[i].coin),
+         amount:Number(Object.values(value)[i].amount)})
+    }
+  }
+}
+
+getProfitData = () =>{
+  let coins = []
+  profitData = []
+  for (let i=0; i<investData.length; i++){
+    if(coins.includes(investData[i].coin)){
+      //loop to the required coin to add up the Amount
+      for (let k=0; k<profitData.length; k++){
+        if(profitData[k].coin===investData[i].coin){
+          profitData[k].amount = (Number(profitData[k].amount) + Number(investData[i].amount))
+        }
+      }
+    }else{
+      coins.push(investData[i].coin)
+      profitData.push({
+         coin: investData[i].coin,
+         amount: investData[i].amount,
+       })
+    }
+    }
+
+    //attaching the price to each row
+
+    for (let n = 0; n<profitData.length; n++){
+      let value = Number(Object.values(this.props.price[profitData[n].coin])
+      * profitData[n].amount).toFixed(2)
+
+      profitData[n].currentValue = Number(value)
 
 
+    }
+}
 
-
-
-
-
-
-
-
+  expandToFullscreen = () => {
+    this.setState({ fullscreen: !this.state.fullscreen, tableHeightFull: !this.state.tableHeightFull })
+  }
 
 render(){
 
-
+  this.getInvestData()
+  this.getProfitData()
 
 console.info('RENDERED')
 //generating cards and coins
@@ -415,7 +470,7 @@ let plusIcon = ''
 
 let cards = this.props.createCardComponent()
 
-console.log(cards)
+console.log(this.props.price)
 
 
 
@@ -434,9 +489,10 @@ console.log(cards)
 
 
 
-
   return(
     <div>
+
+
       <header style={{height: '200px'}} className="App-header"/>
 
 
@@ -451,20 +507,35 @@ console.log(cards)
       </Row>
 
     <Row style={{marginTop: '-95px'}}>
+
       <Col lg={5} md={4} sm={6} className='InvestedSheetCol'>
-        <div className='card card-1'>
+        <Square className='card card-1 investCard'
+            pose={this.state.fullscreen ? "fullscreen" : "idle"}
+          >
+
+          <div>
           <h4>Invested</h4>
+          <div className="expand">
+           <IconButton >
+             <ExpandIcon color={'#BDBDBD'} onClick={this.expandToFullscreen}/>
+           </IconButton>
+           </div>
+           </div>
+
           <AccountTable
             column1="Investment"
             column2="Coin"
             column3="Amount"
             mappedRows="investment"
-            tableData={investData}/>
-          <h5 className='text-center'>{calculateOverallInvestment(investData, 'investment')} $</h5>
+            tableData={investData}
+            height={this.state.tableHeightFull ? '100%' : '150px' }/>
+          <h5 className='text-center'>{calculateOverallInvestment(investData, 'investment').toFixed(2)} $</h5>
 
-        </div>
+
+      </Square>
       </Col>
 
+      {this.state.fullscreen ? '':
       <Col xsHidden smHidden lg={2} md={4} className='AvatarCol'>
 
         <Avatar
@@ -473,8 +544,10 @@ console.log(cards)
          style={AvatarStyle}
           />
 
-      </Col>
+      </Col>}
 
+
+      {this.state.fullscreen ? '':
       <Col   lg={5} md={4} sm={6} className='ProfitSheetCol'>
         <div className='card card-1'>
           <Row>
@@ -489,21 +562,26 @@ console.log(cards)
             </Col>
           </Row>
 
+
             <AccountTable
               column1="Coin"
               column2="Amount"
               column3="Current value"
               mappedRows="profit"
-              tableData={profitData}/>
+              tableData={profitData}
+              height={this.state.tableHeightFull ? '100%' : '150px' }/>
 
             <h5 className="text-center">
               {Profit} $
             </h5>
 
         </div>
-      </Col>
+      </Col>}
+
+
 
     </Row>
+
 
     {/*
     <Row>
@@ -515,8 +593,8 @@ console.log(cards)
     <Row>
     <h3>Your Cards 💵 </h3>
     </Row>
-
     <Row>
+      <div className="cardRow" ref={this.dragulaDecorator}>
 
 
 
@@ -539,8 +617,9 @@ console.log(cards)
 
 
 
-
+</div>
     </Row>
+
 
     <Row>
       <h1>Account: {auth.currentUser.email} </h1>
@@ -554,7 +633,15 @@ console.log(cards)
 
     </div>
   )
+}
+
+dragulaDecorator = (componentBackingInstance) => {
+    if (componentBackingInstance) {
+      let options = { };
+      Dragula([componentBackingInstance], options);
     }
+  };
+
 
 }
 
@@ -572,62 +659,9 @@ const AddCryptoCardButton = (props) =>
 </Col>
 
 
-const profitData = [
-  {
-    coin: 'BTC',
-    amount: '0.5',
-    currentValue: 1000
-  },
-  {
-    coin: 'ETH',
-    amount: '1.5',
-    currentValue: 1000
-  },
-  {
-    coin: 'LTC',
-    amount: '2.5',
-    currentValue: 1000
-  },
-  {
-    coin: 'EOS',
-    amount: '100',
-    currentValue: 1254
-  },
+let profitData = [];
 
-];
-
-const investData = [
-  {
-    investment: 1000,
-    coin: 'BTC',
-    amount: '0.2'
-  },
-  {
-    investment: 500,
-    coin: 'ETH',
-    amount: '1.3'
-  },
-  {
-    investment: 1000,
-    coin: 'EOS',
-    amount: '100'
-  },
-  {
-    investment: 250,
-    coin: 'LTC',
-    amount: '1.2'
-  },
-  {
-    investment: 1250,
-    coin: 'LTC',
-    amount: '1.2'
-  },
-  {
-    investment: 100,
-    coin: 'LTC',
-    amount: '1.2'
-  },
-];
+let investData = [];
 
 
 
@@ -658,9 +692,9 @@ let Invested = 0;
 function formatProfit(num1, num2){
   let profit = num1 - num2;
   if (profit>0){
-    return "+"+profit+ " $"
+    return "+"+Number(profit).toFixed(2)+ " $"
   }else{
-    return "-"+profit+' $'
+    return "-"+Number(profit).toFixed(2)+' $'
   }
 
 }
